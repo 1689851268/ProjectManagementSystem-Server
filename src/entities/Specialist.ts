@@ -9,7 +9,6 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Identity } from './Identity';
-import { Group } from './Group';
 import { Project } from './Project';
 
 @Index('SpecialistForIdentity', ['identity'], {})
@@ -37,8 +36,4 @@ export class Specialist {
     @ManyToMany(() => Project, (project) => project.specialists)
     @JoinTable({ name: 'ProjectAndSpecialist' })
     projects: Project[];
-
-    @ManyToMany(() => Group, (group) => group.specialists)
-    @JoinTable({ name: 'GroupAndSpecialist' })
-    groups: Group[];
 }
