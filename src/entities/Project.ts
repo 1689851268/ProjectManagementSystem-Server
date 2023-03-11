@@ -8,32 +8,52 @@ import {
     ManyToMany,
     ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Status } from './Status';
-import { Type } from './Type';
+import { ProjectStatus } from './ProjectStatus';
+import { ProjectType } from './ProjectType';
 import { ProjectAttachment } from './ProjectAttachment';
 import { Specialist } from './Specialist';
 import { Student } from './Student';
 import { Teacher } from './Teacher';
+import { ProjectAchievement } from './ProjectAchievement';
 
 @Index('ProjectForStatus', ['status'], {})
 @Index('ProjectForType', ['type'], {})
 @Entity()
 export class Project {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '项目Id' })
+    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
-    @Column('varchar', { comment: '项目名称', length: 20 })
+    @Column('varchar', { length: 20 })
     name: string;
 
     @Column('date', { comment: '申报时间' })
     applicationDate: string;
 
-    @OneToOne(() => Student)
-    @JoinColumn({ name: 'projectLeader' })
+    @ManyToOne(() => Student, (student) => student.mainProjects)
+    @JoinColumn({ name: 'projectLeader', referencedColumnName: 'id' })
     projectLeader: Student;
+
+    @ManyToOne(() => ProjectType, (projectType) => projectType.projects)
+    @JoinColumn([{ name: 'type', referencedColumnName: 'id' }])
+    type: ProjectType;
+
+    @ManyToOne(() => Teacher, (teacher) => teacher.projects)
+    @JoinColumn([{ name: 'teacher', referencedColumnName: 'id' }])
+    teacher: Teacher;
+
+    @ManyToOne(() => Specialist, (specialist) => specialist.projects)
+    @JoinColumn([{ name: 'specialist', referencedColumnName: 'id' }])
+    specialist: Specialist;
+
+    @ManyToOne(() => ProjectStatus, (projectStatus) => projectStatus.projects)
+    @JoinColumn([{ name: 'status', referencedColumnName: 'id' }])
+    status: ProjectStatus;
+
+    @ManyToMany(() => Student, (student) => student.projects)
+    @JoinTable({ name: 'project_and_student' })
+    students: Student[];
 
     @OneToMany(
         () => ProjectAttachment,
@@ -41,23 +61,9 @@ export class Project {
     )
     projectAttachments: ProjectAttachment[];
 
-    @ManyToOne(() => Type, (type) => type.projects)
-    @JoinColumn([{ name: 'type', referencedColumnName: 'id' }])
-    type: Type;
-
-    @ManyToOne(() => Status, (status) => status.projects)
-    @JoinColumn([{ name: 'status', referencedColumnName: 'id' }])
-    status: Status;
-
-    @ManyToMany(() => Specialist, (specialist) => specialist.projects)
-    @JoinTable({ name: 'ProjectAndSpecialist' })
-    specialists: Specialist[];
-
-    @ManyToMany(() => Student, (student) => student.projects)
-    @JoinTable({ name: 'ProjectAndStudent' })
-    students: Student[];
-
-    @ManyToMany(() => Teacher, (teacher) => teacher.projects)
-    @JoinTable({ name: 'ProjectAndTeacher' })
-    teachers: Teacher[];
+    @OneToMany(
+        () => ProjectAchievement,
+        (projectAchievement) => projectAchievement.projectId,
+    )
+    projectAchievement: ProjectAchievement[];
 }

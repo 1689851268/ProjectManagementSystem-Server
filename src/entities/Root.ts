@@ -11,10 +11,10 @@ import { Identity } from './Identity';
 @Index('RootForIdentity', ['identity'], {})
 @Entity()
 export class Root {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '账号' })
+    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
-    @Column('varchar', { comment: '密码', length: 20 })
+    @Column('varchar', { length: 20 })
     password: string;
 
     @ManyToOne(() => Identity, (identity) => identity.roots)

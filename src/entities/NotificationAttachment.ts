@@ -11,7 +11,7 @@ import { Notification } from './Notification';
 @Index('AttachmentForNotification', ['notificationId'], {})
 @Entity()
 export class NotificationAttachment {
-    @PrimaryGeneratedColumn({ type: 'int' })
+    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
     @Column('varchar', { length: 20 })

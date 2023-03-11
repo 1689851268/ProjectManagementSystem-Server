@@ -2,13 +2,13 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Project } from './Project';
 
 @Entity()
-export class Type {
-    @PrimaryGeneratedColumn({ type: 'int' })
+export class ProjectStatus {
+    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
     @Column('varchar', { length: 10 })
     name: string;
 
-    @OneToMany(() => Project, (project) => project.type)
+    @OneToMany(() => Project, (project) => project.status)
     projects: Project[];
 }

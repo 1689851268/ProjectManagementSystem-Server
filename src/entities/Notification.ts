@@ -14,11 +14,14 @@ import { NotificationAttachment } from './NotificationAttachment';
 @Index('LastUpdaterForTeacher', ['lastUpdater'], {})
 @Entity()
 export class Notification {
-    @PrimaryGeneratedColumn({ type: 'int' })
+    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
     @Column('varchar', { length: 20 })
     title: string;
+
+    @Column('varchar', { length: 255 })
+    content: string;
 
     @Column('datetime', { comment: '发布时间' })
     publishTime: Date;
@@ -33,17 +36,17 @@ export class Notification {
     })
     isOnTop: '1' | '0';
 
+    @ManyToOne(() => Teacher, (teacher) => teacher.newNotifications)
+    @JoinColumn([{ name: 'publisher', referencedColumnName: 'id' }])
+    publisher: Teacher;
+
+    @ManyToOne(() => Teacher, (teacher) => teacher.oldNotifications)
+    @JoinColumn([{ name: 'lastUpdater', referencedColumnName: 'id' }])
+    lastUpdater: Teacher;
+
     @OneToMany(
         () => NotificationAttachment,
         (notificationAttachment) => notificationAttachment.notificationId,
     )
     notificationAttachments: NotificationAttachment[];
-
-    @ManyToOne(() => Teacher, (teacher) => teacher.notifications)
-    @JoinColumn([{ name: 'publisher', referencedColumnName: 'id' }])
-    publisher: Teacher;
-
-    @ManyToOne(() => Teacher, (teacher) => teacher.notifications)
-    @JoinColumn([{ name: 'lastUpdater', referencedColumnName: 'id' }])
-    lastUpdater: Teacher;
 }

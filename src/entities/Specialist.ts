@@ -3,9 +3,8 @@ import {
     Entity,
     Index,
     JoinColumn,
-    JoinTable,
-    ManyToMany,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Identity } from './Identity';
@@ -14,13 +13,13 @@ import { Project } from './Project';
 @Index('SpecialistForIdentity', ['identity'], {})
 @Entity()
 export class Specialist {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '账号' })
+    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
-    @Column('varchar', { comment: '密码', length: 20 })
+    @Column('varchar', { length: 20 })
     password: string;
 
-    @Column('varchar', { comment: '姓名', length: 30 })
+    @Column('varchar', { length: 30 })
     name: string;
 
     @Column('varchar', { nullable: true, length: 20 })
@@ -33,7 +32,6 @@ export class Specialist {
     @JoinColumn([{ name: 'identity', referencedColumnName: 'id' }])
     identity: Identity;
 
-    @ManyToMany(() => Project, (project) => project.specialists)
-    @JoinTable({ name: 'ProjectAndSpecialist' })
+    @OneToMany(() => Project, (project) => project.specialist)
     projects: Project[];
 }

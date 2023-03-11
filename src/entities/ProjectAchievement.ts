@@ -7,11 +7,12 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+import { AchievementType } from './AchievementType';
 import { Project } from './Project';
 
 @Index('AttachmentForProject', ['projectId'], {})
 @Entity()
-export class ProjectAttachment {
+export class ProjectAchievement {
     @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
@@ -24,4 +25,11 @@ export class ProjectAttachment {
     @ManyToOne(() => Project, (project) => project.projectAttachments)
     @JoinColumn([{ name: 'projectId', referencedColumnName: 'id' }])
     projectId: Project;
+
+    @ManyToOne(
+        () => AchievementType,
+        (achievementType) => achievementType.projects,
+    )
+    @JoinColumn([{ name: 'type', referencedColumnName: 'id' }])
+    type: AchievementType;
 }

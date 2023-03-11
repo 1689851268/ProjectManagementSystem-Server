@@ -1,4 +1,3 @@
-/* GET */
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Root } from './Root';
 import { Specialist } from './Specialist';
@@ -7,7 +6,7 @@ import { Teacher } from './Teacher';
 
 @Entity()
 export class Identity {
-    @PrimaryGeneratedColumn({ type: 'int' })
+    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
     id: number;
 
     @Column('varchar', { length: 10 })
