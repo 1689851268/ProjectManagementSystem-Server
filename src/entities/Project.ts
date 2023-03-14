@@ -22,7 +22,7 @@ import { ProjectAchievement } from './ProjectAchievement';
 @Index('ProjectForType', ['type'], {})
 @Entity()
 export class Project {
-    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
     @Column('varchar', { length: 20 })

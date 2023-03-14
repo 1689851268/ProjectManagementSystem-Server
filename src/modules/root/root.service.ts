@@ -26,8 +26,15 @@ export class RootService {
         });
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} root`;
+    getIdentity(uuid: string) {
+        return this.rootRepository.find({
+            where: {
+                uuid,
+            },
+            relations: {
+                identity: true,
+            },
+        });
     }
 
     update(id: number, updateRootDto: UpdateRootDto) {

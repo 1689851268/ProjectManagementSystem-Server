@@ -13,7 +13,7 @@ import { Project } from './Project';
 @Index('AttachmentForProject', ['projectId'], {})
 @Entity()
 export class ProjectAchievement {
-    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
     @Column('varchar', { length: 20 })

@@ -1,5 +1,7 @@
 import {
+    BeforeInsert,
     Column,
+    CreateDateColumn,
     Entity,
     Index,
     JoinColumn,
@@ -13,13 +15,22 @@ import { College } from './College';
 import { Identity } from './Identity';
 import { Major } from './Major';
 import { Project } from './Project';
+import { v4 as uuid } from 'uuid';
 
 @Index('StudentForCollege', ['college'], {})
 @Index('StudentForIdentity', ['identity'], {})
 @Entity()
 export class Student {
-    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
+    @BeforeInsert()
+    setId() {
+        this.uuid = uuid().slice(0, 8); // 生成长度为 8 的 UUID
+    }
+
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
+
+    @Column('varchar', { length: 8 })
+    uuid: string;
 
     @Column('varchar', { length: 20 })
     password: string;
@@ -27,7 +38,7 @@ export class Student {
     @Column('varchar', { length: 30 })
     name: string;
 
-    @Column('datetime', { comment: '注册时间' })
+    @CreateDateColumn({ comment: '注册时间' })
     registrationTime: Date;
 
     @Column('tinyint', { comment: '所属班级' })

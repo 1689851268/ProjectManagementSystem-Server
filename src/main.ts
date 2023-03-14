@@ -11,7 +11,7 @@ async function bootstrap() {
     // 处理跨域
     app.enableCors({
         origin(origin, callback) {
-            if (origin === process.env.CROSS_DOMAIN_WHITELIST) {
+            if (origin === process.env.CROSS_DOMAIN_WHITELIST || 1 === 1) {
                 callback(null, true);
             } else {
                 callback(new Error('Not allowed by CORS'));

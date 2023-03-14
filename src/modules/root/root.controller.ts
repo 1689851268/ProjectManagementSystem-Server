@@ -25,9 +25,9 @@ export class RootController {
         return this.rootService.find(1);
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.rootService.findOne(+id);
+    @Get(':uuid')
+    getIdentity(@Param('uuid') uuid: string) {
+        return this.rootService.getIdentity(uuid);
     }
 
     @Patch(':id')

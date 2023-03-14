@@ -1,11 +1,13 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { Teacher } from './Teacher';
 import { NotificationAttachment } from './NotificationAttachment';
@@ -14,7 +16,7 @@ import { NotificationAttachment } from './NotificationAttachment';
 @Index('LastUpdaterForTeacher', ['lastUpdater'], {})
 @Entity()
 export class Notification {
-    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
     @Column('varchar', { length: 20 })
@@ -23,10 +25,10 @@ export class Notification {
     @Column('varchar', { length: 255 })
     content: string;
 
-    @Column('datetime', { comment: '发布时间' })
+    @CreateDateColumn({ comment: '发布时间' })
     publishTime: Date;
 
-    @Column('datetime', { comment: '最后更新时间' })
+    @UpdateDateColumn({ comment: '最后更新时间' })
     lastUpdateTime: Date;
 
     @Column('enum', {

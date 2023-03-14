@@ -3,7 +3,7 @@ import { ProjectAchievement } from './ProjectAchievement';
 
 @Entity()
 export class AchievementType {
-    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
     @Column('varchar', { length: 10 })

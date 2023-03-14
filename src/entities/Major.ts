@@ -11,7 +11,7 @@ import { Student } from './Student';
 
 @Entity()
 export class Major {
-    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
     @Column('varchar', { length: 10 })

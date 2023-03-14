@@ -3,7 +3,7 @@ import { Project } from './Project';
 
 @Entity()
 export class ProjectStatus {
-    @PrimaryGeneratedColumn({ type: 'int', zerofill: true, unsigned: true })
+    @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
     @Column('varchar', { length: 10 })
