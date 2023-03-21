@@ -7,10 +7,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryT } from './interface';
-import {
-    getIdsByName,
-    getTeacherIdsByCollegeIds,
-} from '../../utils/queryBuilder';
+import { getIdsByName, getTeacherIdsByCollegeIds } from '@/utils/queryBuilder';
 
 // 处理 projectName 参数
 const handleProjectName = (
