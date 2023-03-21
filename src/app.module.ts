@@ -25,6 +25,7 @@ import { ProjectAchievement } from './entities/ProjectAchievement';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { StudentModule } from './modules/student/student.module';
 import { SpecialistModule } from './modules/specialist/specialist.module';
+import { MetaDataModule } from './modules/meta-data/meta-data.module';
 
 @Module({
     imports: [
@@ -75,6 +76,7 @@ import { SpecialistModule } from './modules/specialist/specialist.module';
         TeacherModule,
         StudentModule,
         SpecialistModule,
+        MetaDataModule,
     ],
     controllers: [],
     providers: [],
