@@ -32,15 +32,18 @@ export class Specialist {
     @Column('varchar', { length: 30 })
     name: string;
 
-    @Column('varchar', { nullable: true, length: 20 })
-    email: string | null;
+    @Column('varchar', { length: 13, comment: '注册时间' })
+    registrationTime: string; // 存储为字符串格式的时间戳
 
-    @Column('varchar', { nullable: true, length: 11 })
-    phone: string | null;
+    @Column('varchar', { length: 30 })
+    email: string; // 可以为空字符串
+
+    @Column('varchar', { length: 11 })
+    phone: string; // 可以为空字符串
 
     @ManyToOne(() => Identity, (identity) => identity.specialists)
     @JoinColumn([{ name: 'identity', referencedColumnName: 'id' }])
-    identity: Identity;
+    identity: number;
 
     @OneToMany(() => Project, (project) => project.specialist)
     projects: Project[];

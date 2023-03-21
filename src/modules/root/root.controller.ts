@@ -26,8 +26,9 @@ export class RootController {
     }
 
     @Get(':uuid')
-    getIdentity(@Param('uuid') uuid: string) {
-        return this.rootService.getIdentity(uuid);
+    async getIdentity(@Param('uuid') uuid: string) {
+        const { identity } = await this.rootService.getIdentity(uuid);
+        return { identity: identity.name };
     }
 
     @Patch(':id')

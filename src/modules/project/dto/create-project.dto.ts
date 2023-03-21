@@ -1,4 +1,11 @@
 export class CreateProjectDto {
     name: string;
-    applicationDate: string;
+    publishTime?: string;
+    applicationDate?: string;
+    projectLeader?: number;
+    type: number;
+    teacher: number;
+    specialist?: number;
+    status?: number;
+    students?: number[];
 }

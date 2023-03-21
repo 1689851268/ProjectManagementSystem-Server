@@ -6,10 +6,12 @@ import {
     Patch,
     Param,
     Delete,
+    Query,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { QueryT } from './interface';
 
 @Controller('project')
 export class ProjectController {
@@ -17,12 +19,31 @@ export class ProjectController {
 
     @Post()
     create(@Body() createProjectDto: CreateProjectDto) {
+        createProjectDto = {
+            name: createProjectDto.name,
+            publishTime: `${new Date().getTime()}`,
+            applicationDate: '',
+            projectLeader: null,
+            type: createProjectDto.type,
+            teacher: createProjectDto.teacher,
+            specialist: null,
+            status: 1,
+        };
         return this.projectService.create(createProjectDto);
     }
 
     @Get()
-    findAll() {
-        return this.projectService.find();
+    findAll(@Query() query: QueryT) {
+        query = {
+            projectName: query.projectName,
+            projectType: +query.projectType,
+            teacher: query.teacher,
+            projectStatus: +query.projectStatus,
+            curPage: +query.curPage,
+            pageSize: +query.pageSize,
+            college: query.college,
+        };
+        return this.projectService.find(query);
     }
 
     @Get(':id')

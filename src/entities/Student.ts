@@ -1,7 +1,6 @@
 import {
     BeforeInsert,
     Column,
-    CreateDateColumn,
     Entity,
     Index,
     JoinColumn,
@@ -38,34 +37,34 @@ export class Student {
     @Column('varchar', { length: 30 })
     name: string;
 
-    @CreateDateColumn({ comment: '注册时间' })
-    registrationTime: Date;
+    @Column('varchar', { length: 13, comment: '注册时间' })
+    registrationTime: string; // 存储为字符串格式的时间戳
 
     @Column('tinyint', { comment: '所属班级' })
     class: number;
 
-    @Column('varchar', { nullable: true, length: 20 })
-    email: string | null;
+    @Column('varchar', { length: 30 })
+    email: string; // 可以为空字符串
 
-    @Column('varchar', { nullable: true, length: 11 })
-    phone: string | null;
+    @Column('varchar', { length: 11 })
+    phone: string; // 可以为空字符串
 
     @ManyToOne(() => Major, (major) => major.students)
     @JoinColumn([{ name: 'major', referencedColumnName: 'id' }])
-    major: Major;
+    major: number;
 
     @ManyToOne(() => College, (college) => college.students)
     @JoinColumn([{ name: 'college', referencedColumnName: 'id' }])
-    college: College;
+    college: number;
 
     @ManyToOne(() => Identity, (identity) => identity.students)
     @JoinColumn([{ name: 'identity', referencedColumnName: 'id' }])
-    identity: Identity;
+    identity: number;
 
     @ManyToMany(() => Project, (project) => project.students)
     @JoinTable({ name: 'project_and_student' })
-    projects: Project[];
+    projects: number[];
 
     @OneToMany(() => Project, (project) => project.projectLeader)
-    mainProjects: Project[];
+    mainProjects: number[];
 }

@@ -21,6 +21,11 @@ export class CollegeController {
         return this.collegeService.create(createCollegeDto);
     }
 
+    @Get('id')
+    getIdsByName(@Query('name') name: string) {
+        return this.collegeService.getIdsByName(name);
+    }
+
     @Get()
     find(@Query('keyword') keyword: string) {
         return this.collegeService.find(keyword);

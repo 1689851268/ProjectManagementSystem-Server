@@ -27,6 +27,15 @@ export class CollegeService {
         }
     }
 
+    // 根据 name 模糊查询 collegeId
+    getIdsByName(name: string) {
+        return this.collegeRepository
+            .createQueryBuilder('college')
+            .select('college.id')
+            .where('college.name like :name', { name: `%${name}%` })
+            .getRawMany();
+    }
+
     update(id: number, updateCollegeDto: UpdateCollegeDto) {
         return this.collegeRepository.update(id, updateCollegeDto);
     }

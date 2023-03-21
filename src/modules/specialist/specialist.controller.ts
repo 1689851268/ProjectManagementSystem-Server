@@ -1,0 +1,54 @@
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+} from '@nestjs/common';
+import { SpecialistService } from './specialist.service';
+import { CreateSpecialistDto } from './dto/create-specialist.dto';
+import { UpdateSpecialistDto } from './dto/update-specialist.dto';
+
+@Controller('specialist')
+export class SpecialistController {
+    constructor(private readonly specialistService: SpecialistService) {}
+
+    @Post()
+    create(@Body() createSpecialistDto: CreateSpecialistDto) {
+        // 处理 body 的数据格式
+        createSpecialistDto = {
+            password: createSpecialistDto.password,
+            name: createSpecialistDto.name,
+            registrationTime: `${new Date().getTime()}`,
+            email: createSpecialistDto.email || '',
+            phone: createSpecialistDto.phone || '',
+            identity: 3,
+        };
+        return this.specialistService.create(createSpecialistDto);
+    }
+
+    @Get()
+    findAll() {
+        return this.specialistService.findAll();
+    }
+
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.specialistService.findOne(+id);
+    }
+
+    @Patch(':id')
+    update(
+        @Param('id') id: string,
+        @Body() updateSpecialistDto: UpdateSpecialistDto,
+    ) {
+        return this.specialistService.update(+id, updateSpecialistDto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.specialistService.remove(+id);
+    }
+}

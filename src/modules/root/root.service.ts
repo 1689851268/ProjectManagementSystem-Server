@@ -26,15 +26,23 @@ export class RootService {
         });
     }
 
+    // getIdentity(uuid: string) {
+    //     return this.rootRepository.find({
+    //         where: {
+    //             uuid,
+    //         },
+    //         relations: {
+    //             identity: true,
+    //         },
+    //     });
+    // }
+
     getIdentity(uuid: string) {
-        return this.rootRepository.find({
-            where: {
-                uuid,
-            },
-            relations: {
-                identity: true,
-            },
-        });
+        return this.rootRepository
+            .createQueryBuilder('root')
+            .leftJoinAndSelect('root.identity', 'identity')
+            .where('root.uuid = :uuid', { uuid })
+            .getOne();
     }
 
     update(id: number, updateRootDto: UpdateRootDto) {

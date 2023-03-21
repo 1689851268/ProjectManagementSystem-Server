@@ -22,6 +22,9 @@ import { RootModule } from './modules/root/root.module';
 import { AchievementType } from './entities/AchievementType';
 import { Major } from './entities/Major';
 import { ProjectAchievement } from './entities/ProjectAchievement';
+import { TeacherModule } from './modules/teacher/teacher.module';
+import { StudentModule } from './modules/student/student.module';
+import { SpecialistModule } from './modules/specialist/specialist.module';
 
 @Module({
     imports: [
@@ -34,6 +37,7 @@ import { ProjectAchievement } from './entities/ProjectAchievement';
             inject: [ConfigService],
             useFactory(configService: ConfigService) {
                 return {
+                    logging: true,
                     type: configService.get(DbConfig.TYPE),
                     host: configService.get(DbConfig.HOST),
                     port: configService.get(DbConfig.PORT),
@@ -68,6 +72,9 @@ import { ProjectAchievement } from './entities/ProjectAchievement';
         RootModule,
         ProjectModule,
         ProjectAttachmentModule,
+        TeacherModule,
+        StudentModule,
+        SpecialistModule,
     ],
     controllers: [],
     providers: [],
