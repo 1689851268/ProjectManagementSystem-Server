@@ -11,7 +11,7 @@ import {
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { QueryT } from './interface';
+import { QueryT } from './utils/interface';
 
 @Controller('project')
 export class ProjectController {
