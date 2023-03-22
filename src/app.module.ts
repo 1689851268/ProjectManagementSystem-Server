@@ -26,6 +26,7 @@ import { TeacherModule } from './modules/teacher/teacher.module';
 import { StudentModule } from './modules/student/student.module';
 import { SpecialistModule } from './modules/specialist/specialist.module';
 import { MetaDataModule } from './modules/meta-data/meta-data.module';
+import { NotificationAttachmentModule } from './modules/notification-attachment/notification-attachment.module';
 
 @Module({
     imports: [
@@ -77,6 +78,7 @@ import { MetaDataModule } from './modules/meta-data/meta-data.module';
         StudentModule,
         SpecialistModule,
         MetaDataModule,
+        NotificationAttachmentModule,
     ],
     controllers: [],
     providers: [],

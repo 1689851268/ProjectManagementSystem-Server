@@ -25,5 +25,5 @@ export class NotificationAttachment {
         (notification) => notification.notificationAttachments,
     )
     @JoinColumn([{ name: 'notificationId', referencedColumnName: 'id' }])
-    notificationId: Notification;
+    notificationId: number;
 }

@@ -1,7 +1,7 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { Body, Query } from '@nestjs/common/decorators';
+import { Body, Param, Query } from '@nestjs/common/decorators';
 import { NotificationQuery } from './utils/interfaces';
 
 @Controller('notification')
@@ -31,6 +31,12 @@ export class NotificationController {
     @Get('attachment')
     findAttachment() {
         return this.notificationService.findAttachment();
+    }
+
+    @Get(':id')
+    getNotificationById(@Param('id') id: number) {
+        id = +id;
+        return this.notificationService.getNotificationById(id);
     }
 
     @Post()

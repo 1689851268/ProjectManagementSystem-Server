@@ -63,6 +63,35 @@ export class NotificationService {
         // });
     }
 
+    // 根据 notification-id 查询 notification
+    async getNotificationById(id: number) {
+        // 使用 QueryBuilder
+        // 通过 notification-id 查询 notification 和 notificationAttachment
+        // 通过 publisher 和 lastUpdater 查询 teacher
+        const res = await this.notificationRepository
+            .createQueryBuilder('notification')
+            .select([
+                'notification.id',
+                'notification.title',
+                'notification.content',
+                'notification.lastUpdateTime',
+                'notification.publishTime',
+                'notificationAttachment.name',
+                'notificationAttachment.storagePath',
+                'publisher.name',
+                'lastUpdater.name',
+            ])
+            .leftJoin(
+                'notification.notificationAttachments',
+                'notificationAttachment',
+            )
+            .leftJoin('notification.publisher', 'publisher')
+            .leftJoin('notification.lastUpdater', 'lastUpdater')
+            .where('notification.id = :id', { id })
+            .getOne();
+        return res || {};
+    }
+
     async findAttachment() {
         const notification = await this.findOne(1);
         console.log('notification', notification);
