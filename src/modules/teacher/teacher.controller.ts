@@ -18,7 +18,6 @@ export class TeacherController {
 
     @Post()
     create(@Body() createTeacherDto: CreateTeacherDto) {
-        // 处理 body 的数据格式
         createTeacherDto = {
             password: createTeacherDto.password,
             name: createTeacherDto.name,

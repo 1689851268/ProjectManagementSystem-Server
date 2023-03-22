@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'src/entities/Notification';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { NotificationQuery } from './utils/interfaces';
 
 @Injectable()
 export class NotificationService {
@@ -18,43 +20,52 @@ export class NotificationService {
         return this.notificationRepository.findOne({ where: { id } });
     }
 
-    find(keyWord: string, page: number, pageSize: number) {
-        return this.notificationRepository.findAndCount({
-            where: {
-                title: Like(`%${keyWord}%`),
-            },
-            order: {
-                id: 'DESC',
-            },
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        });
+    // 根据 title 模糊查询, 并分页
+    find(notificationQuery: NotificationQuery) {
+        const { title, curPage, pageSize } = notificationQuery;
+        return this.notificationRepository
+            .createQueryBuilder('notification')
+            .select([
+                'notification.id',
+                'notification.title',
+                'notification.content',
+                'notification.lastUpdateTime',
+            ])
+            .where('notification.title LIKE :title', {
+                title: `%${title}%`,
+            })
+            .skip((curPage - 1) * pageSize)
+            .take(pageSize)
+            .getManyAndCount();
     }
 
     findPublisher(id: number) {
-        return this.notificationRepository.findAndCount({
-            where: {
-                id,
-            },
-            relations: {
-                publisher: true,
-            },
-        });
+        console.log('id', id);
+        // return this.notificationRepository.findAndCount({
+        //     where: {
+        //         id,
+        //     },
+        //     relations: {
+        //         publisher: true,
+        //     },
+        // });
     }
 
     findLastUpdater(id: number) {
-        return this.notificationRepository.findAndCount({
-            where: {
-                id, // 多对一 / 一对一
-            },
-            relations: {
-                publisher: true,
-            },
-        });
+        console.log('id', id);
+        // return this.notificationRepository.findAndCount({
+        //     where: {
+        //         id, // 多对一 / 一对一
+        //     },
+        //     relations: {
+        //         publisher: true,
+        //     },
+        // });
     }
 
     async findAttachment() {
         const notification = await this.findOne(1);
+        console.log('notification', notification);
         return this.notificationRepository.find({
             // where: notification, // 一对多 / 多对多
             relations: {
@@ -63,9 +74,11 @@ export class NotificationService {
         });
     }
 
-    create(notification: Notification) {
-        const newNotification =
-            this.notificationRepository.create(notification);
+    // 创建通知
+    create(createNotificationDto: CreateNotificationDto) {
+        const newNotification = this.notificationRepository.create(
+            createNotificationDto,
+        );
         return this.notificationRepository.save(newNotification);
     }
 

@@ -1,16 +1,15 @@
 import {
     Column,
-    CreateDateColumn,
     Entity,
     Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn,
 } from 'typeorm';
 import { Teacher } from './Teacher';
 import { NotificationAttachment } from './NotificationAttachment';
+import { IsOnTop } from '@/utils/interfaces';
 
 @Index('PublisherForTeacher', ['publisher'], {})
 @Index('LastUpdaterForTeacher', ['lastUpdater'], {})
@@ -22,29 +21,29 @@ export class Notification {
     @Column('varchar', { length: 20 })
     title: string;
 
-    @Column('varchar', { length: 255 })
+    @Column('text') // 'text' 是 MySQL 的类型, 用于存储大量文本
     content: string;
 
-    @CreateDateColumn({ comment: '发布时间' })
-    publishTime: Date;
+    @Column('varchar', { length: 13, comment: '发布时间' })
+    publishTime: string;
 
-    @UpdateDateColumn({ comment: '最后更新时间' })
-    lastUpdateTime: Date;
+    @Column('varchar', { length: 13, comment: '最后更新时间' })
+    lastUpdateTime: string;
 
     @Column('enum', {
         comment: '是否置顶',
-        enum: ['1', '0'],
-        default: '0',
+        enum: [1, 0],
+        default: 0,
     })
-    isOnTop: '1' | '0';
+    isOnTop: IsOnTop;
 
     @ManyToOne(() => Teacher, (teacher) => teacher.newNotifications)
     @JoinColumn([{ name: 'publisher', referencedColumnName: 'id' }])
-    publisher: Teacher;
+    publisher: number;
 
     @ManyToOne(() => Teacher, (teacher) => teacher.oldNotifications)
     @JoinColumn([{ name: 'lastUpdater', referencedColumnName: 'id' }])
-    lastUpdater: Teacher;
+    lastUpdater: number;
 
     @OneToMany(
         () => NotificationAttachment,
