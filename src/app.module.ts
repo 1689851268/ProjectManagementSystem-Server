@@ -39,7 +39,7 @@ import { NotificationAttachmentModule } from './modules/notification-attachment/
             inject: [ConfigService],
             useFactory(configService: ConfigService) {
                 return {
-                    logging: true,
+                    logging: process.env.NODE_ENV === 'development', // 开发环境下打印日志
                     type: configService.get(DbConfig.TYPE),
                     host: configService.get(DbConfig.HOST),
                     port: configService.get(DbConfig.PORT),

@@ -4,57 +4,88 @@ import { Teacher } from '@/entities/Teacher';
 import { getIdsByName, getTeacherIdsByCollegeIds } from '@/utils/queryBuilder';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 
-// 处理 projectName 参数
+/**
+ * 处理 projectName 参数
+ * @param result queryBuilder 对象
+ * @param projectName 项目名
+ */
 const handleProjectName = (
     result: SelectQueryBuilder<Project>,
     projectName: string,
 ) => {
+    if (!projectName) return;
     result.where('project.name like :keyword', {
         keyword: `%${projectName}%`,
     });
 };
 
-// 处理 projectType 参数
+/**
+ * 处理 projectType 参数
+ * @param result queryBuilder 对象
+ * @param projectType 项目类型
+ */
 const handleProjectType = (
     result: SelectQueryBuilder<Project>,
     projectType: number,
 ) => {
+    if (!projectType) return;
     result.andWhere('project.type = :type', { type: projectType });
 };
 
-// 处理 projectType 参数
+/**
+ * 处理 projectStatus 参数
+ * @param result queryBuilder 对象
+ * @param projectStatus 项目状态
+ */
 const handleProjectStatus = (
     result: SelectQueryBuilder<Project>,
     projectStatus: number,
 ) => {
+    if (!projectStatus) return;
     result.andWhere('project.status = :status', {
         status: projectStatus,
     });
 };
 
-// 处理 teacher 参数
+/**
+ * 处理 teacher 参数
+ * @param teacherRepository teacher 实体的 Repository
+ * @param result queryBuilder 对象
+ * @param teacher 教师名
+ */
 const handleTeacher = async (
     teacherRepository: Repository<Teacher>,
     result: SelectQueryBuilder<Project>,
     teacher: string,
 ) => {
+    if (!teacher) return;
+
     // 先根据 teacher 模糊查询得到 idArr
     const idArr = await getIdsByName(teacherRepository, teacher, 'teacher');
     // 如果 idArr 为空, 则将 idArr 的第一个元素设为 0, 以便后面筛选
     if (idArr.length === 0) {
         idArr.push(0);
     }
+
     // 然后筛选 project 表, 找到 id 数组对应的项目
-    return result.andWhere('project.teacher in (:...idArr)', { idArr });
+    result.andWhere('project.teacher in (:...idArr)', { idArr });
 };
 
-// 处理 college 参数
+/**
+ * 处理 college 参数
+ * @param collegeRepository college 实体的 Repository
+ * @param teacherRepository teacher 实体的 Repository
+ * @param result queryBuilder 对象
+ * @param college 学院名
+ */
 const handleCollege = async (
     collegeRepository: Repository<College>,
     teacherRepository: Repository<Teacher>,
     result: SelectQueryBuilder<Project>,
     college: string,
 ) => {
+    if (!college) return;
+
     // 先根据 college 模糊查询得到 id 数组
     const collegeIdArr = await getIdsByName(
         collegeRepository,
@@ -77,7 +108,7 @@ const handleCollege = async (
     }
 
     // 最后筛选 project 表, 找到老师对应的项目
-    return result.andWhere('project.teacher in (:...teacherIdArr)', {
+    result.andWhere('project.teacher in (:...teacherIdArr)', {
         teacherIdArr,
     });
 };

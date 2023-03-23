@@ -37,43 +37,29 @@ export class ProjectService {
             college,
         } = query;
 
-        let result = this.projectRepository
+        const result = this.projectRepository
             .createQueryBuilder('project')
             .select('*');
 
         // 搜索项目名称
-        if (projectName) {
-            queryHandler.projectName(result, projectName);
-        }
+        queryHandler.projectName(result, projectName);
 
         // 搜索该类型的项目
-        if (projectType) {
-            queryHandler.projectType(result, projectType);
-        }
+        queryHandler.projectType(result, projectType);
 
         // 搜索该状态的项目
-        if (projectStatus) {
-            queryHandler.projectStatus(result, projectStatus);
-        }
+        queryHandler.projectStatus(result, projectStatus);
 
-        // 搜索该老师负责的项目
-        if (teacher) {
-            result = await queryHandler.teacher(
-                this.teacherRepository,
-                result,
-                teacher,
-            );
-        }
+        // 搜索该老师负责的项目; 因为需要查询 teacher 表, 所以需要传入 teacherRepository
+        await queryHandler.teacher(this.teacherRepository, result, teacher);
 
-        // 搜索该学院的项目
-        if (college) {
-            result = await queryHandler.college(
-                this.collegeRepository,
-                this.teacherRepository,
-                result,
-                college,
-            );
-        }
+        // 搜索该学院的项目; 因为需要查询 college & teacher 表, 所以需要传入 collegeRepository & teacherRepository
+        await queryHandler.college(
+            this.collegeRepository,
+            this.teacherRepository,
+            result,
+            college,
+        );
 
         const data = await result
             .offset((curPage - 1) * pageSize)
