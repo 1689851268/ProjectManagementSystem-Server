@@ -8,4 +8,5 @@ export class CreateProjectDto {
     specialist?: number;
     status?: number;
     students?: number[];
+    description: string;
 }

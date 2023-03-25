@@ -61,7 +61,9 @@ export class ProjectService {
             college,
         );
 
+        // 倒序排列, 以 id 为准; 分页
         const data = await result
+            .orderBy('project.id', 'DESC')
             .offset((curPage - 1) * pageSize)
             .limit(pageSize)
             .getRawMany();
@@ -80,7 +82,9 @@ export class ProjectService {
         return `This action updates a #${id} project`;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} project`;
+    // 根据 id 删除项目
+    async remove(id: number) {
+        const res = await this.projectRepository.delete(id);
+        return res.affected; // 返回删除的条数
     }
 }

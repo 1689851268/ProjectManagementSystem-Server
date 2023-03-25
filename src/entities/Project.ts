@@ -27,6 +27,9 @@ export class Project {
     @Column('varchar', { length: 20 })
     name: string;
 
+    @Column('varchar', { length: 200 })
+    description: string;
+
     @Column('varchar', { length: 13, comment: '发布时间' })
     publishTime: string;
 

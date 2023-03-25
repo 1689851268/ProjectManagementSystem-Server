@@ -28,6 +28,7 @@ export class ProjectController {
             teacher: createProjectDto.teacher,
             specialist: null,
             status: 1,
+            description: createProjectDto.description,
         };
         return this.projectService.create(createProjectDto);
     }
