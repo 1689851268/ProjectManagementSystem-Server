@@ -6,7 +6,7 @@ import { ProjectStatus } from '@/entities/ProjectStatus';
 import { ProjectType } from '@/entities/ProjectType';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateMetaDatumDto } from './dto/create-meta-datum.dto';
 import { UpdateMetaDatumDto } from './dto/update-meta-datum.dto';
 
@@ -36,10 +36,12 @@ export class MetaDataService {
         return {
             achievementTypes: await this.achievementTypeRepository.find(),
             colleges: await this.collegeRepository.find(),
-            identities: await this.identityRepository.find(),
             majors: await this.majorRepository.find(),
             projectStatuses: await this.projectStatusRepository.find(),
             projectTypes: await this.projectTypeRepository.find(),
+            identities: await this.identityRepository.find({
+                where: { id: Not(4) }, // 剔除 id 为 4 的管理员身份
+            }),
         };
     }
 

@@ -22,5 +22,5 @@ export class Major {
 
     @ManyToOne(() => College, (college) => college.majors)
     @JoinColumn([{ name: 'college', referencedColumnName: 'id' }])
-    college: College;
+    college: number;
 }

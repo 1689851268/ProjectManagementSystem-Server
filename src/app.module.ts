@@ -27,6 +27,8 @@ import { StudentModule } from './modules/student/student.module';
 import { SpecialistModule } from './modules/specialist/specialist.module';
 import { MetaDataModule } from './modules/meta-data/meta-data.module';
 import { NotificationAttachmentModule } from './modules/notification-attachment/notification-attachment.module';
+import { UserModule } from './modules/user/user.module';
+import { MajorModule } from './modules/major/major.module';
 
 @Module({
     imports: [
@@ -79,6 +81,8 @@ import { NotificationAttachmentModule } from './modules/notification-attachment/
         SpecialistModule,
         MetaDataModule,
         NotificationAttachmentModule,
+        UserModule,
+        MajorModule,
     ],
     controllers: [],
     providers: [],
