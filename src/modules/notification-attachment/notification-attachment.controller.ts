@@ -1,15 +1,6 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { NotificationAttachmentService } from './notification-attachment.service';
 import { CreateNotificationAttachmentDto } from './dto/create-notification-attachment.dto';
-import { UpdateNotificationAttachmentDto } from './dto/update-notification-attachment.dto';
 
 @Controller('notification-attachment')
 export class NotificationAttachmentController {
@@ -30,32 +21,5 @@ export class NotificationAttachmentController {
         return this.notificationAttachmentService.create(
             createNotificationAttachmentDto,
         );
-    }
-
-    @Get()
-    findAll() {
-        return this.notificationAttachmentService.findAll();
-    }
-
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.notificationAttachmentService.findOne(+id);
-    }
-
-    @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body()
-        updateNotificationAttachmentDto: UpdateNotificationAttachmentDto,
-    ) {
-        return this.notificationAttachmentService.update(
-            +id,
-            updateNotificationAttachmentDto,
-        );
-    }
-
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.notificationAttachmentService.remove(+id);
     }
 }

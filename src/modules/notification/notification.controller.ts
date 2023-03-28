@@ -3,6 +3,7 @@ import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { Body, Delete, Param, Query } from '@nestjs/common/decorators';
 import { NotificationListQuery, NotificationQuery } from './utils/interfaces';
+import { ParseIntPipe } from '@nestjs/common/pipes';
 
 @Controller('notification')
 export class NotificationController {
@@ -30,24 +31,13 @@ export class NotificationController {
         return this.notificationService.findList(query);
     }
 
-    @Get('publisher')
-    findPublisher() {
-        return this.notificationService.findPublisher(1);
-    }
-
-    @Get('lastUpdater')
-    findLastUpdater() {
-        return this.notificationService.findLastUpdater(1);
-    }
-
     @Get('attachment')
     findAttachment() {
         return this.notificationService.findAttachment();
     }
 
     @Get(':id')
-    getNotificationById(@Param('id') id: number) {
-        id = +id;
+    getNotificationById(@Param('id', ParseIntPipe) id: number) {
         return this.notificationService.getNotificationById(id);
     }
 

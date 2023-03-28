@@ -1,15 +1,6 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { SpecialistService } from './specialist.service';
 import { CreateSpecialistDto } from './dto/create-specialist.dto';
-import { UpdateSpecialistDto } from './dto/update-specialist.dto';
 
 @Controller('specialist')
 export class SpecialistController {
@@ -27,28 +18,5 @@ export class SpecialistController {
             identity: 3,
         };
         return this.specialistService.create(createSpecialistDto);
-    }
-
-    @Get()
-    findAll() {
-        return this.specialistService.findAll();
-    }
-
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.specialistService.findOne(+id);
-    }
-
-    @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateSpecialistDto: UpdateSpecialistDto,
-    ) {
-        return this.specialistService.update(+id, updateSpecialistDto);
-    }
-
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.specialistService.remove(+id);
     }
 }

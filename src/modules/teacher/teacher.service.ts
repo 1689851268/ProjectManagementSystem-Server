@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Teacher } from 'src/entities/Teacher';
 import { Repository } from 'typeorm';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
-import { UpdateTeacherDto } from './dto/update-teacher.dto';
 
 @Injectable()
 export class TeacherService {
@@ -15,14 +14,6 @@ export class TeacherService {
     create(createTeacherDto: CreateTeacherDto) {
         const newTeacher = this.teacherRepository.create(createTeacherDto);
         return this.teacherRepository.save(newTeacher);
-    }
-
-    findAll() {
-        return `This action returns all teacher`;
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} teacher`;
     }
 
     // 根据 name 模糊查询 teacherIds
@@ -41,13 +32,5 @@ export class TeacherService {
             .select('teacher.id')
             .where('teacher.college in (:...collegeIds)', { collegeIds })
             .getRawMany();
-    }
-
-    update(id: number, updateTeacherDto: UpdateTeacherDto) {
-        return `This action updates a #${id} teacher`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} teacher`;
     }
 }

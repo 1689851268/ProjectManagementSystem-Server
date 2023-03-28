@@ -7,6 +7,7 @@ import {
     Param,
     Delete,
     Query,
+    ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -61,8 +62,11 @@ export class UserController {
     }
 
     @Get(':uuid') // 获取用户信息, 用于用户信息修改
-    findOne(@Param('uuid') uuid: string, @Query('identity') identity: number) {
-        return this.userService.findOne(uuid, +identity);
+    findOne(
+        @Param('uuid') uuid: string,
+        @Query('identity', ParseIntPipe) identity: number,
+    ) {
+        return this.userService.findOne(uuid, identity);
     }
 
     @Patch(':uuid') // 修改用户信息

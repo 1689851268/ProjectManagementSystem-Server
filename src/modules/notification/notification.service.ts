@@ -74,30 +74,6 @@ export class NotificationService {
             .getManyAndCount();
     }
 
-    findPublisher(id: number) {
-        console.log('id', id);
-        // return this.notificationRepository.findAndCount({
-        //     where: {
-        //         id,
-        //     },
-        //     relations: {
-        //         publisher: true,
-        //     },
-        // });
-    }
-
-    findLastUpdater(id: number) {
-        console.log('id', id);
-        // return this.notificationRepository.findAndCount({
-        //     where: {
-        //         id, // 多对一 / 一对一
-        //     },
-        //     relations: {
-        //         publisher: true,
-        //     },
-        // });
-    }
-
     // 根据 notification-id 查询 notification
     async getNotificationById(id: number) {
         // 使用 QueryBuilder

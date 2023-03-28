@@ -5,7 +5,6 @@ import { Project } from 'src/entities/Project';
 import { Teacher } from 'src/entities/Teacher';
 import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryT } from './utils/interface';
 import { formatProjectData, queryHandler } from './utils/serviceHandler';
 
@@ -72,14 +71,6 @@ export class ProjectService {
             data: await formatProjectData(data, this.teacherRepository),
             total: await result.getCount(),
         };
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} project`;
-    }
-
-    update(id: number, updateProjectDto: UpdateProjectDto) {
-        return `This action updates a #${id} project`;
     }
 
     // 根据 id 删除项目

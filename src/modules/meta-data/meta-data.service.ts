@@ -7,8 +7,6 @@ import { ProjectType } from '@/entities/ProjectType';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
-import { CreateMetaDatumDto } from './dto/create-meta-datum.dto';
-import { UpdateMetaDatumDto } from './dto/update-meta-datum.dto';
 
 @Injectable()
 export class MetaDataService {
@@ -27,10 +25,6 @@ export class MetaDataService {
         private readonly projectTypeRepository: Repository<ProjectType>,
     ) {}
 
-    create(createMetaDatumDto: CreateMetaDatumDto) {
-        return 'This action adds a new metaDatum';
-    }
-
     // 获取所有的元数据
     async findAll() {
         return {
@@ -43,17 +37,5 @@ export class MetaDataService {
                 where: { id: Not(4) }, // 剔除 id 为 4 的管理员身份
             }),
         };
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} metaDatum`;
-    }
-
-    update(id: number, updateMetaDatumDto: UpdateMetaDatumDto) {
-        return `This action updates a #${id} metaDatum`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} metaDatum`;
     }
 }

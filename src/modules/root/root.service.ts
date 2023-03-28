@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Root } from 'src/entities/Root';
 import { Repository } from 'typeorm';
 import { CreateRootDto } from './dto/create-root.dto';
-import { UpdateRootDto } from './dto/update-root.dto';
 
 @Injectable()
 export class RootService {
@@ -26,31 +25,11 @@ export class RootService {
         });
     }
 
-    // getIdentity(uuid: string) {
-    //     return this.rootRepository.find({
-    //         where: {
-    //             uuid,
-    //         },
-    //         relations: {
-    //             identity: true,
-    //         },
-    //     });
-    // }
-
     getIdentity(uuid: string) {
         return this.rootRepository
             .createQueryBuilder('root')
             .leftJoinAndSelect('root.identity', 'identity')
             .where('root.uuid = :uuid', { uuid })
             .getOne();
-    }
-
-    update(id: number, updateRootDto: UpdateRootDto) {
-        console.log(updateRootDto);
-        return `This action updates a #${id} root`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} root`;
     }
 }
