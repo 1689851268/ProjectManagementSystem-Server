@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'src/entities/Notification';
 import { Repository } from 'typeorm';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { NotificationQuery } from './utils/interfaces';
+import { NotificationListQuery, NotificationQuery } from './utils/interfaces';
 
 @Injectable()
 export class NotificationService {
@@ -20,7 +20,7 @@ export class NotificationService {
         return this.notificationRepository.findOne({ where: { id } });
     }
 
-    // 根据 title 模糊查询, 并分页
+    // 根据 title 模糊查询; 分页; 按发布时间降序排列
     find(notificationQuery: NotificationQuery) {
         const { title, curPage, pageSize } = notificationQuery;
         return this.notificationRepository
@@ -34,6 +34,41 @@ export class NotificationService {
             .where('notification.title LIKE :title', {
                 title: `%${title}%`,
             })
+            .orderBy('notification.lastUpdateTime', 'DESC')
+            .skip((curPage - 1) * pageSize)
+            .take(pageSize)
+            .getManyAndCount();
+    }
+
+    // 根据 title, publisher, lastUpdater 模糊查询; 分页; 按发布时间降序排列
+    findList(notificationListQuery: NotificationListQuery) {
+        const { title, curPage, pageSize, publisher, lastUpdater } =
+            notificationListQuery;
+        return this.notificationRepository
+            .createQueryBuilder('notification')
+            .leftJoin('notification.publisher', 'publisher')
+            .leftJoin('notification.lastUpdater', 'lastUpdater')
+            .where('notification.title LIKE :title', {
+                title: `%${title}%`,
+            })
+            .andWhere('publisher.name LIKE :publisher', {
+                publisher: `%${publisher}%`,
+            })
+            .andWhere('lastUpdater.name LIKE :lastUpdater', {
+                lastUpdater: `%${lastUpdater}%`,
+            })
+            .select([
+                'notification.id',
+                'notification.title',
+                'notification.content',
+                'notification.lastUpdateTime',
+                'notification.publishTime',
+                'publisher.id',
+                'publisher.name',
+                'lastUpdater.id',
+                'lastUpdater.name',
+            ])
+            .orderBy('notification.publishTime', 'DESC')
             .skip((curPage - 1) * pageSize)
             .take(pageSize)
             .getManyAndCount();

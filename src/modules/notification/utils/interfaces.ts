@@ -3,3 +3,8 @@ export interface NotificationQuery {
     curPage: number;
     pageSize: number;
 }
+
+export interface NotificationListQuery extends NotificationQuery {
+    publisher: string;
+    lastUpdater: string;
+}

@@ -1,8 +1,8 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { Body, Param, Query } from '@nestjs/common/decorators';
-import { NotificationQuery } from './utils/interfaces';
+import { Body, Delete, Param, Query } from '@nestjs/common/decorators';
+import { NotificationListQuery, NotificationQuery } from './utils/interfaces';
 
 @Controller('notification')
 export class NotificationController {
@@ -16,6 +16,18 @@ export class NotificationController {
             pageSize: +query.pageSize || 5,
         };
         return this.notificationService.find(query);
+    }
+
+    @Get('list')
+    findList(@Query() query: NotificationListQuery) {
+        query = {
+            title: query.title,
+            curPage: +query.curPage || 1,
+            pageSize: +query.pageSize || 5,
+            publisher: query.publisher,
+            lastUpdater: query.lastUpdater,
+        };
+        return this.notificationService.findList(query);
     }
 
     @Get('publisher')
@@ -51,5 +63,10 @@ export class NotificationController {
             lastUpdateTime: `${new Date().getTime()}`,
         };
         return this.notificationService.create(createNotificationDto);
+    }
+
+    @Delete(':id')
+    delete(@Param('id') id: number) {
+        return this.notificationService.remove(+id);
     }
 }
