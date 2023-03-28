@@ -19,20 +19,21 @@ export class UserService {
         private readonly specialistRepository: Repository<Specialist>,
     ) {}
 
+    // 建立 identity 与 repository 的映射
     repository = {
         1: this.studentRepository,
         2: this.teacherRepository,
         3: this.specialistRepository,
     };
 
+    // 根据 identity 创建用户
     create(createUserDto: CreateUserDto) {
-        // 根据用户身份创建用户
         const newUser =
             this.repository[createUserDto.identity].create(createUserDto);
         return this.repository[createUserDto.identity].save(newUser);
     }
 
-    // 根据用户身份查询用户列表
+    // 根据 identity 获取用户列表; 支持分页; 支持 name, uuid 模糊查询; 按 registrationTime 降序排列
     findAll(userQuery: UserQuery) {
         const { curPage, pageSize, name, identity, uuid } = userQuery;
         return this.repository[identity]
@@ -46,10 +47,8 @@ export class UserService {
             .getManyAndCount();
     }
 
-    // 根据用户身份、uuid 查询用户
+    // 根据 identity, uuid 获取用户信息, 用于用户信息修改
     findOne(uuid: string, identity: number) {
-        console.log({ uuid, identity });
-
         const queryBuilder =
             this.repository[identity].createQueryBuilder('user');
 
@@ -104,8 +103,9 @@ export class UserService {
         return queryBuilder.where('user.uuid = :uuid', { uuid }).getOne();
     }
 
+    // 根据 uuid 更新用户信息
     update(uuid: string, updateUserDto: UpdateUserDto) {
-        // 使用 queryBuilder 更新用户, 根据 uuid 获取用户
+        // 根据 identity 获取 queryBuilder
         const queryBuilder =
             this.repository[updateUserDto.identity].createQueryBuilder('user');
 
@@ -148,9 +148,51 @@ export class UserService {
         }
     }
 
-    // 根据用户身份、uuid 删除用户
+    // 根据 identity, uuid 删除用户
     remove(removeBody: RemoveBody) {
         const { uuid, identity } = removeBody;
         return this.repository[identity].delete({ uuid });
+    }
+
+    // 根据 identity, uuid 获取用户信息, 用于用户信息展示
+    getProfile(uuid: string, identity: number) {
+        // 根据 identity 获取 queryBuilder
+        const queryBuilder =
+            this.repository[identity].createQueryBuilder('user');
+
+        // 每个 identity 都需要查询的字段
+        let selectArr = [
+            'user.uuid',
+            'user.name',
+            'user.registrationTime',
+            'user.email',
+            'user.phone',
+        ];
+
+        // 根据 identity 进行联表, 并获取额外需要查询的字段
+        switch (identity) {
+            case 2:
+                queryBuilder.leftJoinAndSelect('user.college', 'college');
+                selectArr = [...selectArr, 'college.id', 'college.name'];
+                break;
+            case 1:
+                queryBuilder
+                    .leftJoinAndSelect('user.college', 'college')
+                    .leftJoinAndSelect('user.major', 'major');
+                selectArr = [
+                    ...selectArr,
+                    'college.id',
+                    'college.name',
+                    'major.id',
+                    'major.name',
+                    'user.class',
+                ];
+                break;
+        }
+
+        return queryBuilder
+            .select(selectArr)
+            .where('user.uuid = :uuid', { uuid })
+            .getOne();
     }
 }

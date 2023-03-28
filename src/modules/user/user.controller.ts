@@ -17,7 +17,7 @@ import { RemoveBody, UserQuery } from './utils/interfaces';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Post()
+    @Post() // 创建用户
     create(@Body() createUserDto: CreateUserDto) {
         // 处理 body 的数据格式: 根据身份不同, 添加不同的字段
         // 1. 学生: identity, name, password, college, major, class, (email), (phone)
@@ -32,7 +32,6 @@ export class UserController {
             phone: createUserDto.phone || '',
             identity: +createUserDto.identity,
         };
-        console.log(createUserDto);
         if (createUserDto.identity === 2) {
             createUserDto = {
                 ...createUserDto,
@@ -49,7 +48,7 @@ export class UserController {
         return this.userService.create(createUserDto);
     }
 
-    @Get()
+    @Get() // 获取用户列表
     findAll(@Query() userQuery: UserQuery) {
         userQuery = {
             curPage: +userQuery.curPage,
@@ -61,12 +60,12 @@ export class UserController {
         return this.userService.findAll(userQuery);
     }
 
-    @Get(':uuid')
+    @Get(':uuid') // 获取用户信息, 用于用户信息修改
     findOne(@Param('uuid') uuid: string, @Query('identity') identity: number) {
         return this.userService.findOne(uuid, +identity);
     }
 
-    @Patch(':uuid')
+    @Patch(':uuid') // 修改用户信息
     update(@Param('uuid') uuid: string, @Body() updateUserDto: UpdateUserDto) {
         updateUserDto = {
             ...updateUserDto,
@@ -77,8 +76,16 @@ export class UserController {
         return this.userService.update(uuid, updateUserDto);
     }
 
-    @Delete()
+    @Delete() // 删除用户
     remove(@Body() body: RemoveBody) {
         return this.userService.remove(body);
+    }
+
+    @Get('profile/:uuid') // 获取用户个人信息
+    getProfile(
+        @Param('uuid') uuid: string,
+        @Query('identity') identity: number,
+    ) {
+        return this.userService.getProfile(uuid, +identity);
     }
 }
