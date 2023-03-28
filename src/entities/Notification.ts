@@ -30,13 +30,6 @@ export class Notification {
     @Column('varchar', { length: 13, comment: '最后更新时间' })
     lastUpdateTime: string;
 
-    @Column('enum', {
-        comment: '是否置顶',
-        enum: [1, 0],
-        default: 0,
-    })
-    isOnTop: IsOnTop;
-
     @ManyToOne(() => Teacher, (teacher) => teacher.newNotifications)
     @JoinColumn([{ name: 'publisher', referencedColumnName: 'id' }])
     publisher: number;
