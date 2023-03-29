@@ -7,6 +7,7 @@ import {
     Delete,
     Query,
     UseGuards,
+    ParseIntPipe,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
@@ -43,6 +44,12 @@ export class ProjectController {
         return this.projectService.apply(applyProjectDto);
     }
 
+    // 撤销申请
+    @Post('revoke')
+    revokeApply(@Body('projectId', ParseIntPipe) projectId: number) {
+        return this.projectService.revokeApply(projectId);
+    }
+
     @Get()
     findAll(@Query() query: QueryT) {
         query = {
@@ -55,6 +62,24 @@ export class ProjectController {
             college: query.college,
         };
         return this.projectService.find(query);
+    }
+
+    @Get(':userId/:identity')
+    findByProjectLeader(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Param('identity', ParseIntPipe) identity: number,
+        @Query() query: QueryT,
+    ) {
+        query = {
+            projectName: query.projectName,
+            projectType: +query.projectType,
+            teacher: query.teacher,
+            projectStatus: +query.projectStatus,
+            curPage: +query.curPage,
+            pageSize: +query.pageSize,
+            college: query.college,
+        };
+        return this.projectService.findByProjectLeader(userId, identity, query);
     }
 
     @Delete(':id')

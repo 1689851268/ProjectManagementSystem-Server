@@ -74,6 +74,98 @@ export class ProjectService {
         return { project, teammate };
     }
 
+    // 撤销申请
+    async revokeApply(projectId: number) {
+        // 使用 QueryBuilder 更新数据, 将项目的 status 设置为 1, projectLeader 设置为 null, applicationDate 设置为 ""
+        const project = await this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set({
+                status: 1,
+                projectLeader: null,
+                applicationDate: '',
+            })
+            .where('id = :id', { id: projectId })
+            .execute();
+
+        // 删除 project_and_student 表中的数据
+        const projectAndStudent = this.projectRepository
+            .createQueryBuilder()
+            .delete()
+            .from('project_and_student')
+            .where('projectId = :projectId', { projectId })
+            .execute();
+
+        return { project, projectAndStudent };
+    }
+
+    // 根据 ProjectLeader 查询项目
+    async findByProjectLeader(userId: number, identity: number, query: QueryT) {
+        const {
+            projectName,
+            projectType,
+            teacher,
+            projectStatus,
+            curPage,
+            pageSize,
+            college,
+        } = query;
+
+        // 根据 identity 判断是学生, 老师, 还是专家
+        // 如果是学生, 则 userId 为 projectLeader
+        // 如果是老师, 则 userId 为 teacherId
+        // 如果是专家, 则 userId 为 specialist
+        const props = {
+            1: 'projectLeader',
+            2: 'teacher',
+            3: 'specialist',
+        };
+
+        // 根据 projectLeader 查询项目
+        const result = this.projectRepository
+            .createQueryBuilder('project')
+            .select('*')
+            .where(`project.${props[identity]} = :userId`, {
+                userId,
+            });
+
+        // 搜索项目名称
+        queryHandler.projectName(result, projectName);
+
+        // 搜索该类型的项目
+        queryHandler.projectType(result, projectType);
+
+        // 搜索该状态的项目
+        queryHandler.projectStatus(result, projectStatus);
+
+        // 搜索该老师负责的项目; 因为需要查询 teacher 表, 所以需要传入 teacherRepository
+        await queryHandler.teacher(this.teacherRepository, result, teacher);
+
+        // 搜索该学院的项目; 因为需要查询 college & teacher 表, 所以需要传入 collegeRepository & teacherRepository
+        await queryHandler.college(
+            this.collegeRepository,
+            this.teacherRepository,
+            result,
+            college,
+        );
+
+        // 倒序排列, 以 id 为准; 分页
+        const data = await result
+            .orderBy('project.id', 'DESC')
+            .offset((curPage - 1) * pageSize)
+            .limit(pageSize)
+            .getRawMany();
+
+        return {
+            data: await formatProjectData(
+                data,
+                this.teacherRepository,
+                this.studentRepository,
+            ),
+            total: await result.getCount(),
+        };
+    }
+
     // 根据条件查询项目
     async find(query: QueryT) {
         const {
