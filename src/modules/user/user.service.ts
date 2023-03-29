@@ -213,6 +213,7 @@ export class UserService {
                     'user.uuid',
                     'user.password',
                     'user.id',
+                    'user.name',
                     'identity.id',
                 ])
                 .where('user.uuid = :uuid', { uuid })
@@ -221,6 +222,7 @@ export class UserService {
             // 如果查询到用户信息, 则返回用户信息
             if (result) {
                 return {
+                    name: result.name as string,
                     uuid: result.uuid as string,
                     id: result.id as number,
                     password: result.password as string,
