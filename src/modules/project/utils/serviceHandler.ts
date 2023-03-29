@@ -1,5 +1,6 @@
 import { College } from '@/entities/College';
 import { Project } from '@/entities/Project';
+import { Student } from '@/entities/Student';
 import { Teacher } from '@/entities/Teacher';
 import { getIdsByName, getTeacherIdsByCollegeIds } from '@/utils/queryBuilder';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -131,6 +132,7 @@ export const queryHandler = {
 export const formatProjectData = async (
     data: Project[],
     teacherRepository: Repository<Teacher>,
+    studentRepository: Repository<Student>,
 ) => {
     const newData = [];
 
@@ -143,9 +145,32 @@ export const formatProjectData = async (
             .select(['college.name', 'teacher.name'])
             .where('teacher.id = :id', { id: item.teacher })
             .getRawOne();
+
+        // 如果项目负责人不为空, 则查询项目负责人的 name
+        let projectLeader: number | string = item.projectLeader;
+        if (projectLeader) {
+            // 使用 QueryBuilder, 根据 projectLeader 查询 student.name
+            const student = await studentRepository
+                .createQueryBuilder('student')
+                .select(['student.name'])
+                .where('student.id = :id', { id: item.projectLeader })
+                .getOne();
+            projectLeader = student.name;
+        }
+
+        // 如果项目申请时间不为空, 则格式化项目申请时间
+        let applicationDate = item.applicationDate;
+        if (applicationDate) {
+            applicationDate = new Date(+applicationDate).toLocaleString();
+        }
+
+        console.log({ item, projectLeader, applicationDate });
+
         // 将 college 和 teacher 添加到 item 中
         newData.push({
             ...item,
+            applicationDate, // 添加项目申请时间
+            projectLeader, // 添加项目负责人的 name
             college: college_name, // 添加项目所属学院的 name
             teacher: teacher_name, // 添加项目指导老师的 name
             publishTime: new Date(+item.publishTime).toLocaleString(), // 格式化发布时间

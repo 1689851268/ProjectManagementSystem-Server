@@ -6,12 +6,15 @@ import {
     Param,
     Delete,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
-import { CreateProjectDto } from './dto/create-project.dto';
+import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
 import { QueryT } from './utils/interface';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('project')
+@UseGuards(AuthGuard('jwt')) // 使用 JWT 鉴权校验用户信息
 export class ProjectController {
     constructor(private readonly projectService: ProjectService) {}
 
@@ -29,6 +32,15 @@ export class ProjectController {
             description: createProjectDto.description,
         };
         return this.projectService.create(createProjectDto);
+    }
+
+    @Post('apply')
+    apply(@Body() applyProjectDto: ApplyProjectDto) {
+        applyProjectDto = {
+            ...applyProjectDto,
+            applicationDate: `${new Date().getTime()}`,
+        };
+        return this.projectService.apply(applyProjectDto);
     }
 
     @Get()

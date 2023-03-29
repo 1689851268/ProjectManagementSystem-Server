@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import * as dotenv from 'dotenv';
+import { ValidationPipe } from '@nestjs/common';
 
 dotenv.config();
 
@@ -21,6 +22,13 @@ async function bootstrap() {
 
     // 全局注册异常过滤器
     app.useGlobalFilters(new HttpExceptionFilter());
+
+    // 使用全局管道
+    app.useGlobalPipes(
+        new ValidationPipe({
+            // whitelist: true, // 开启白名单, 剥离经过验证的对象中没有任何装饰器的任何属性
+        }),
+    );
 
     await app.listen(3000);
 }

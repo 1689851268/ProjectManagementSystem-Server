@@ -1,4 +1,12 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Menu } from './menu.entity';
 import { Root } from './Root';
 import { Specialist } from './Specialist';
 import { Student } from './Student';
@@ -23,4 +31,8 @@ export class Identity {
 
     @OneToMany(() => Teacher, (teacher) => teacher.identity)
     teachers: Teacher[];
+
+    // @ManyToMany(() => Menu, (menu) => menu.identities)
+    // @JoinTable({ name: 'menus_and_identities' })
+    // menus: number[];
 }

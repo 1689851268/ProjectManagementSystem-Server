@@ -195,4 +195,38 @@ export class UserService {
             .where('user.uuid = :uuid', { uuid })
             .getOne();
     }
+
+    // 根据 uuid 获取用户信息, 用于登录
+    async getProfileByUuid(uuid: string) {
+        // 遍历 repository, 从每个表中查询用户信息
+        for (const key in this.repository) {
+            // 跳过原型链上的属性
+            if (!Object.prototype.hasOwnProperty.call(this.repository, key))
+                break;
+
+            // 根据 uuid 获取用户的 uuid, password, identity 字段, 需要联合 identity 表查询
+            const repository = this.repository[key];
+            const result = await repository
+                .createQueryBuilder('user')
+                .leftJoinAndSelect('user.identity', 'identity')
+                .select([
+                    'user.uuid',
+                    'user.password',
+                    'user.id',
+                    'identity.id',
+                ])
+                .where('user.uuid = :uuid', { uuid })
+                .getOne();
+
+            // 如果查询到用户信息, 则返回用户信息
+            if (result) {
+                return {
+                    uuid: result.uuid as string,
+                    id: result.id as number,
+                    password: result.password as string,
+                    identity: result.identity.id as number,
+                };
+            }
+        }
+    }
 }

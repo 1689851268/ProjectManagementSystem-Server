@@ -1,10 +1,11 @@
+import { Student } from '@/entities/Student';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { College } from 'src/entities/College';
 import { Project } from 'src/entities/Project';
 import { Teacher } from 'src/entities/Teacher';
 import { Repository } from 'typeorm';
-import { CreateProjectDto } from './dto/create-project.dto';
+import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
 import { QueryT } from './utils/interface';
 import { formatProjectData, queryHandler } from './utils/serviceHandler';
 
@@ -17,11 +18,60 @@ export class ProjectService {
         private readonly teacherRepository: Repository<Teacher>,
         @InjectRepository(College)
         private readonly collegeRepository: Repository<College>,
+        @InjectRepository(Student)
+        private readonly studentRepository: Repository<Student>,
     ) {}
 
     create(createProjectDto: CreateProjectDto) {
         const newProject = this.projectRepository.create(createProjectDto);
         return this.projectRepository.save(newProject);
+    }
+
+    // 申请项目
+    async apply(applyProjectDto: ApplyProjectDto) {
+        // 使用 QueryBuilder 更新数据
+        // 1. 根据 projectId 查询项目, 并将项目的 status 设置为 2, projectLeader 设置为 applyUserId, applicationDate 设置为当前时间
+        const project = await this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set({
+                status: 2,
+                projectLeader: applyProjectDto.applyUserId,
+                applicationDate: applyProjectDto.applicationDate,
+            })
+            .where('id = :id', { id: applyProjectDto.projectId })
+            .execute();
+
+        // 2. 为 project_and_student 表插入数据, 项目 id 为 projectId, 学生 id 为 teammateId 里面的所有 id
+        const { projectId, teammateId } = applyProjectDto;
+        const teammate = [];
+        teammateId.forEach(async (id) => {
+            // 先查看该学生是否已经申请了项目, 如果已经申请了项目, 则不允许再次申请
+            const againApply = await this.projectRepository
+                .createQueryBuilder('project')
+                .select('project.id')
+                .innerJoin(
+                    'project_and_student',
+                    'pas',
+                    'pas.projectId = project.id',
+                )
+                .where('pas.studentId = :id', { id })
+                .getOne();
+            if (againApply) {
+                return;
+            }
+
+            // 如果没有申请过项目, 则允许申请
+            const res = await this.projectRepository
+                .createQueryBuilder()
+                .insert()
+                .into('project_and_student')
+                .values({ projectId, studentId: id })
+                .execute();
+            teammate.push(res);
+        });
+
+        return { project, teammate };
     }
 
     // 根据条件查询项目
@@ -68,7 +118,11 @@ export class ProjectService {
             .getRawMany();
 
         return {
-            data: await formatProjectData(data, this.teacherRepository),
+            data: await formatProjectData(
+                data,
+                this.teacherRepository,
+                this.studentRepository,
+            ),
             total: await result.getCount(),
         };
     }
