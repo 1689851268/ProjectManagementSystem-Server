@@ -164,8 +164,6 @@ export const formatProjectData = async (
             applicationDate = new Date(+applicationDate).toLocaleString();
         }
 
-        console.log({ item, projectLeader, applicationDate });
-
         // 将 college 和 teacher 添加到 item 中
         newData.push({
             ...item,

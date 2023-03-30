@@ -6,6 +6,7 @@ import { Project } from 'src/entities/Project';
 import { Teacher } from 'src/entities/Teacher';
 import { Repository } from 'typeorm';
 import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryT } from './utils/interface';
 import { formatProjectData, queryHandler } from './utils/serviceHandler';
 
@@ -25,6 +26,17 @@ export class ProjectService {
     create(createProjectDto: CreateProjectDto) {
         const newProject = this.projectRepository.create(createProjectDto);
         return this.projectRepository.save(newProject);
+    }
+
+    // 根据 id 更新项目
+    update(id: number, updateProjectDto: UpdateProjectDto) {
+        // 使用 QueryBuilder 更新数据
+        return this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set(updateProjectDto)
+            .where('id = :id', { id })
+            .execute();
     }
 
     // 申请项目
@@ -164,6 +176,16 @@ export class ProjectService {
             ),
             total: await result.getCount(),
         };
+    }
+
+    // 根据 id 查询项目的 name, type, description
+    findOne(id: number) {
+        // 使用 QueryBuilder 查询数据
+        return this.projectRepository
+            .createQueryBuilder('project')
+            .select('project.name, project.type, project.description')
+            .where('project.id = :id', { id })
+            .getRawOne();
     }
 
     // 根据条件查询项目

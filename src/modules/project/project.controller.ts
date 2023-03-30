@@ -8,11 +8,14 @@ import {
     Query,
     UseGuards,
     ParseIntPipe,
+    Patch,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
 import { QueryT } from './utils/interface';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { UpdateProjectPipe } from './pipes/update-project.pipe';
 
 @Controller('project')
 @UseGuards(AuthGuard('jwt')) // 使用 JWT 鉴权校验用户信息
@@ -64,6 +67,12 @@ export class ProjectController {
         return this.projectService.find(query);
     }
 
+    // 根据 id 查询项目的 name, type, description
+    @Get(':id')
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.projectService.findOne(id);
+    }
+
     @Get(':userId/:identity')
     findByProjectLeader(
         @Param('userId', ParseIntPipe) userId: number,
@@ -85,5 +94,13 @@ export class ProjectController {
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.projectService.remove(+id);
+    }
+
+    @Patch(':id')
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body(UpdateProjectPipe) updateProjectDto: UpdateProjectDto,
+    ) {
+        return this.projectService.update(id, updateProjectDto);
     }
 }

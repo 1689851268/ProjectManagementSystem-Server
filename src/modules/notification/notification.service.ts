@@ -105,7 +105,6 @@ export class NotificationService {
 
     async findAttachment() {
         const notification = await this.findOne(1);
-        console.log('notification', notification);
         return this.notificationRepository.find({
             // where: notification, // 一对多 / 多对多
             relations: {
