@@ -28,6 +28,8 @@ export class ProjectController {
             name: createProjectDto.name,
             publishTime: `${new Date().getTime()}`,
             applicationDate: '',
+            failureTime: '',
+            openTime: '',
             projectLeader: null,
             type: createProjectDto.type,
             teacher: createProjectDto.teacher,
@@ -67,6 +69,24 @@ export class ProjectController {
         @Body('specialist') specialist: number,
     ) {
         return this.projectService.allowApply(projectId, specialist);
+    }
+
+    // 专家拒绝开题 or 专家拒绝结题
+    @Patch('rejectOpen')
+    rejectOpen(@Body('projectId') projectId: number) {
+        return this.projectService.rejectOpen(projectId);
+    }
+
+    // 专家同意开题
+    @Patch('allowOpen')
+    allowOpen(@Body('projectId') projectId: number) {
+        return this.projectService.allowOpen(projectId);
+    }
+
+    // 专家同意结题
+    @Patch('allowClose')
+    allowClose(@Body('projectId') projectId: number) {
+        return this.projectService.allowClose(projectId);
     }
 
     // 获取所有的项目

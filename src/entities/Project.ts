@@ -36,6 +36,15 @@ export class Project {
     @Column('varchar', { length: 13, comment: '申报时间' })
     applicationDate: string; // 可以为空字符串, 表示该项目尚未被申报
 
+    @Column('varchar', { length: 13, comment: '失效时间' })
+    failureTime: string; // 可以为空字符串
+
+    @Column('varchar', { length: 13, comment: '开题时间' })
+    openTime: string; // 可以为空字符串
+
+    @Column('varchar', { length: 13, comment: '结题时间' })
+    finishTime: string; // 可以为空字符串
+
     @ManyToOne(() => Student, (student) => student.mainProjects)
     @JoinColumn({ name: 'projectLeader', referencedColumnName: 'id' })
     projectLeader: number; // 可以为 0, 表示没有项目负责人

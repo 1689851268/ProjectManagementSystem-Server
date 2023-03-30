@@ -9,6 +9,8 @@ export class CreateProjectDto {
     status?: number;
     students?: number[];
     description: string;
+    failureTime?: string;
+    openTime?: string;
 }
 
 export class ApplyProjectDto {

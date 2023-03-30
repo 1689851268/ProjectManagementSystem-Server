@@ -139,6 +139,48 @@ export class ProjectService {
         return { project, projectAndStudent };
     }
 
+    // 专家拒绝开题 and 专家拒绝结题
+    rejectOpen(projectId: number) {
+        // 使用 QueryBuilder 更新数据, 将项目的 status 设置为 6, failureTime 设置为当前时间
+        return this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set({
+                status: 6,
+                failureTime: `${new Date().getTime()}`,
+            })
+            .where('id = :id', { id: projectId })
+            .execute();
+    }
+
+    // 专家同意开题
+    allowOpen(projectId: number) {
+        // 根据 projectId 更新 status: 4, openTime: 当前时间
+        return this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set({
+                status: 4,
+                openTime: `${new Date().getTime()}`,
+            })
+            .where('id = :id', { id: projectId })
+            .execute();
+    }
+
+    // 专家同意结题
+    allowClose(projectId: number) {
+        // 根据 projectId 更新 status: 5, finishTime: 当前时间
+        return this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set({
+                status: 5,
+                finishTime: `${new Date().getTime()}`,
+            })
+            .where('id = :id', { id: projectId })
+            .execute();
+    }
+
     // 根据 ProjectLeader 查询项目
     async findByProjectLeader(userId: number, identity: number, query: QueryT) {
         const {
