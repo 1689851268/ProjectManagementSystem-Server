@@ -14,7 +14,7 @@ export class NotificationAttachment {
     @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
     id: number;
 
-    @Column('varchar', { length: 20 })
+    @Column('varchar', { length: 50 })
     name: string;
 
     @Column('varchar', { length: 100 })

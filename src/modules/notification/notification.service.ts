@@ -1,3 +1,4 @@
+import { NotificationAttachment } from '@/entities/NotificationAttachment';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'src/entities/Notification';
@@ -10,6 +11,8 @@ export class NotificationService {
     constructor(
         @InjectRepository(Notification)
         private readonly notificationRepository: Repository<Notification>,
+        @InjectRepository(NotificationAttachment)
+        private readonly notificationAttachmentRepository: Repository<NotificationAttachment>,
     ) {}
 
     findAll() {
@@ -89,6 +92,7 @@ export class NotificationService {
                 'notification.publishTime',
                 'notificationAttachment.name',
                 'notificationAttachment.storagePath',
+                'notificationAttachment.id',
                 'publisher.name',
                 'lastUpdater.name',
             ])
@@ -104,7 +108,6 @@ export class NotificationService {
     }
 
     async findAttachment() {
-        const notification = await this.findOne(1);
         return this.notificationRepository.find({
             // where: notification, // 一对多 / 多对多
             relations: {
@@ -114,18 +117,95 @@ export class NotificationService {
     }
 
     // 创建通知
-    create(createNotificationDto: CreateNotificationDto) {
-        const newNotification = this.notificationRepository.create(
-            createNotificationDto,
-        );
-        return this.notificationRepository.save(newNotification);
+    async create(createNotificationDto: CreateNotificationDto) {
+        const { attachment, ...rest } = createNotificationDto;
+        const temp = this.notificationRepository.create(rest);
+        const notification = await this.notificationRepository.save(temp);
+
+        // 如果有附件, 则插入 notificationAttachment 表
+        let attachmentArr: any = null;
+        if (attachment.length > 0) {
+            // attachment 为一个数组, { name, url } 为数组的元素
+            // 使用 QueryBuilder, 更新 notificationAttachments 表的 name, url, notificationId
+            // 为 attachment 数组元素的 name, url 和 notification.id
+            attachmentArr = await this.notificationAttachmentRepository
+                .createQueryBuilder()
+                .insert()
+                .into(NotificationAttachment)
+                .values(
+                    attachment.map((item) => ({
+                        name: item.name,
+                        storagePath: item.url,
+                        notificationId: notification.id,
+                    })),
+                )
+                .execute();
+        }
+
+        return { notification, attachmentArr };
     }
 
-    update(id: number, notification: Partial<Notification>) {
-        return this.notificationRepository.update(id, notification);
+    async update(id: number, notification: Partial<CreateNotificationDto>) {
+        const { attachment, ...rest } = notification;
+        // 使用 QueryBuilder, 根据 id 更新 notification 表: title, content, lastUpdateTime, lastUpdater
+        const newNotification = await this.notificationRepository
+            .createQueryBuilder()
+            .update(Notification)
+            .set(rest)
+            .where('id = :id', { id })
+            .execute();
+
+        // 先删除 notificationAttachment 表中 notificationId 为 id 的数据
+        await this.notificationAttachmentRepository
+            .createQueryBuilder()
+            .delete()
+            .from(NotificationAttachment)
+            .where('notificationId = :id', { id })
+            .execute();
+
+        // 如果有附件, 则插入 notificationAttachment 表
+        let attachmentArr: any = null;
+        if (attachment.length > 0) {
+            // attachment 为一个数组, { name, url } 为数组的元素
+            // 使用 QueryBuilder, 更新 notificationAttachments 表的 name, url, notificationId
+            // 为 attachment 数组元素的 name, url 和 notification.id
+            attachmentArr = await this.notificationAttachmentRepository
+                .createQueryBuilder()
+                .insert()
+                .into(NotificationAttachment)
+                .values(
+                    attachment.map((item) => ({
+                        name: item.name,
+                        storagePath: item.url,
+                        notificationId: id,
+                    })),
+                )
+                .execute();
+        }
+
+        return { newNotification, attachmentArr, status: 201 };
     }
 
     remove(id: number) {
         return this.notificationRepository.delete(id);
+    }
+
+    // 根据 id 获取通知详情, 包括 title, content, attachment
+    getNotificationDetailById(id: number) {
+        return this.notificationRepository
+            .createQueryBuilder('notification')
+            .select([
+                'notification.id',
+                'notification.title',
+                'notification.content',
+                'notificationAttachment.name',
+                'notificationAttachment.storagePath',
+            ])
+            .leftJoin(
+                'notification.notificationAttachments',
+                'notificationAttachment',
+            )
+            .where('notification.id = :id', { id })
+            .getOne();
     }
 }

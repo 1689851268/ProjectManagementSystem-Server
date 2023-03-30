@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { Teacher } from './Teacher';
 import { NotificationAttachment } from './NotificationAttachment';
-import { IsOnTop } from '@/utils/interfaces';
 
 @Index('PublisherForTeacher', ['publisher'], {})
 @Index('LastUpdaterForTeacher', ['lastUpdater'], {})
