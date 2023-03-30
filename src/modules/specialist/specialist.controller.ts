@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Query, Get } from '@nestjs/common';
 import { SpecialistService } from './specialist.service';
 import { CreateSpecialistDto } from './dto/create-specialist.dto';
 
@@ -18,5 +18,11 @@ export class SpecialistController {
             identity: 3,
         };
         return this.specialistService.create(createSpecialistDto);
+    }
+
+    // 通过 keyword 查询专家
+    @Get()
+    findAll(@Query('keyword') keyword: string) {
+        return this.specialistService.findAll(keyword);
     }
 }

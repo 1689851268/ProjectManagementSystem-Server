@@ -6,9 +6,18 @@ import { Project } from 'src/entities/Project';
 import { Teacher } from 'src/entities/Teacher';
 import { College } from 'src/entities/College';
 import { Student } from '@/entities/Student';
+import { Specialist } from '@/entities/Specialist';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Project, Teacher, College, Student])],
+    imports: [
+        TypeOrmModule.forFeature([
+            Project,
+            Teacher,
+            College,
+            Student,
+            Specialist,
+        ]),
+    ],
     controllers: [ProjectController],
     providers: [ProjectService],
 })

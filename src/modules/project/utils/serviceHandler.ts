@@ -1,5 +1,6 @@
 import { College } from '@/entities/College';
 import { Project } from '@/entities/Project';
+import { Specialist } from '@/entities/Specialist';
 import { Student } from '@/entities/Student';
 import { Teacher } from '@/entities/Teacher';
 import { getIdsByName, getTeacherIdsByCollegeIds } from '@/utils/queryBuilder';
@@ -133,6 +134,7 @@ export const formatProjectData = async (
     data: Project[],
     teacherRepository: Repository<Teacher>,
     studentRepository: Repository<Student>,
+    specialistRepository: Repository<Specialist>,
 ) => {
     const newData = [];
 
@@ -164,11 +166,24 @@ export const formatProjectData = async (
             applicationDate = new Date(+applicationDate).toLocaleString();
         }
 
+        // 如果专家不为空, 则查询专家的 name
+        let specialist: string | number = item.specialist;
+        if (specialist) {
+            // 使用 QueryBuilder, 根据 specialist 查询 specialist.name
+            const temp = await specialistRepository
+                .createQueryBuilder('specialist')
+                .select(['specialist.name'])
+                .where('specialist.id = :id', { id: item.specialist })
+                .getOne();
+            specialist = temp.name;
+        }
+
         // 将 college 和 teacher 添加到 item 中
         newData.push({
             ...item,
             applicationDate, // 添加项目申请时间
             projectLeader, // 添加项目负责人的 name
+            specialist, // 添加专家的 name
             college: college_name, // 添加项目所属学院的 name
             teacher: teacher_name, // 添加项目指导老师的 name
             publishTime: new Date(+item.publishTime).toLocaleString(), // 格式化发布时间

@@ -38,6 +38,7 @@ export class ProjectController {
         return this.projectService.create(createProjectDto);
     }
 
+    // 学生申请项目
     @Post('apply')
     apply(@Body() applyProjectDto: ApplyProjectDto) {
         applyProjectDto = {
@@ -47,12 +48,28 @@ export class ProjectController {
         return this.projectService.apply(applyProjectDto);
     }
 
-    // 撤销申请
+    // 学生撤销申请
     @Post('revoke')
     revokeApply(@Body('projectId', ParseIntPipe) projectId: number) {
         return this.projectService.revokeApply(projectId);
     }
 
+    // 教师拒绝申请
+    @Post('reject')
+    rejectApply(@Body('projectId', ParseIntPipe) projectId: number) {
+        return this.projectService.rejectApply(projectId);
+    }
+
+    // 教师同意申请
+    @Patch('allow')
+    allowApply(
+        @Body('projectId') projectId: number,
+        @Body('specialist') specialist: number,
+    ) {
+        return this.projectService.allowApply(projectId, specialist);
+    }
+
+    // 获取所有的项目
     @Get()
     findAll(@Query() query: QueryT) {
         query = {
@@ -67,12 +84,13 @@ export class ProjectController {
         return this.projectService.find(query);
     }
 
-    // 根据 id 查询项目的 name, type, description
+    // 根据 projectId 查询项目的 name, type, description; 用于辅助更新项目信息
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.projectService.findOne(id);
     }
 
+    // 根据项目负责人 id 查询项目
     @Get(':userId/:identity')
     findByProjectLeader(
         @Param('userId', ParseIntPipe) userId: number,
@@ -91,11 +109,13 @@ export class ProjectController {
         return this.projectService.findByProjectLeader(userId, identity, query);
     }
 
+    // 删除项目
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.projectService.remove(+id);
     }
 
+    // 更新项目信息
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,

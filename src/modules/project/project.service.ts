@@ -1,3 +1,4 @@
+import { Specialist } from '@/entities/Specialist';
 import { Student } from '@/entities/Student';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,6 +22,8 @@ export class ProjectService {
         private readonly collegeRepository: Repository<College>,
         @InjectRepository(Student)
         private readonly studentRepository: Repository<Student>,
+        @InjectRepository(Specialist)
+        private readonly specialistRepository: Repository<Specialist>,
     ) {}
 
     create(createProjectDto: CreateProjectDto) {
@@ -86,7 +89,32 @@ export class ProjectService {
         return { project, teammate };
     }
 
-    // 撤销申请
+    // 教师拒绝申请
+    async rejectApply(projectId: number) {
+        // 根据 projectId 更新 status: 1, applicationDate: "", projectLeader: null
+        const project = await this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set({
+                status: 1,
+                applicationDate: '',
+                projectLeader: null,
+            })
+            .where('id = :id', { id: projectId })
+            .execute();
+
+        // 根据 projectId 删除 project_and_student 表中的数据
+        const projectAndStudent = await this.projectRepository
+            .createQueryBuilder()
+            .delete()
+            .from('project_and_student')
+            .where('projectId = :projectId', { projectId })
+            .execute();
+
+        return { project, projectAndStudent };
+    }
+
+    // 学生撤销申请
     async revokeApply(projectId: number) {
         // 使用 QueryBuilder 更新数据, 将项目的 status 设置为 1, projectLeader 设置为 null, applicationDate 设置为 ""
         const project = await this.projectRepository
@@ -173,12 +201,13 @@ export class ProjectService {
                 data,
                 this.teacherRepository,
                 this.studentRepository,
+                this.specialistRepository,
             ),
             total: await result.getCount(),
         };
     }
 
-    // 根据 id 查询项目的 name, type, description
+    // 根据 projectId 查询项目的 name, type, description; 用于辅助更新项目信息
     findOne(id: number) {
         // 使用 QueryBuilder 查询数据
         return this.projectRepository
@@ -236,6 +265,7 @@ export class ProjectService {
                 data,
                 this.teacherRepository,
                 this.studentRepository,
+                this.specialistRepository,
             ),
             total: await result.getCount(),
         };
@@ -245,5 +275,20 @@ export class ProjectService {
     async remove(id: number) {
         const res = await this.projectRepository.delete(id);
         return res.affected; // 返回删除的条数
+    }
+
+    // 根据 projectId 更新 project 表
+    allowApply(projectId: number, specialist: number) {
+        // 使用 QueryBuilder 更新数据
+        // 更新 status 为 3, specialist 为 specialist
+        return this.projectRepository
+            .createQueryBuilder()
+            .update(Project)
+            .set({
+                status: 3,
+                specialist,
+            })
+            .where('id = :id', { id: projectId })
+            .execute();
     }
 }
