@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RemoveBody, UserQuery } from './utils/interfaces';
+import { Root } from '@/entities/Root';
 
 @Injectable()
 export class UserService {
@@ -17,6 +18,8 @@ export class UserService {
         private readonly teacherRepository: Repository<Teacher>,
         @InjectRepository(Specialist)
         private readonly specialistRepository: Repository<Specialist>,
+        @InjectRepository(Root)
+        private readonly rootRepository: Repository<Root>,
     ) {}
 
     // 建立 identity 与 repository 的映射
@@ -24,6 +27,7 @@ export class UserService {
         1: this.studentRepository,
         2: this.teacherRepository,
         3: this.specialistRepository,
+        4: this.rootRepository,
     };
 
     // 根据 identity 创建用户
@@ -204,18 +208,29 @@ export class UserService {
             if (!Object.prototype.hasOwnProperty.call(this.repository, key))
                 break;
 
+            let selectArr = [
+                'user.uuid',
+                'user.password',
+                'user.id',
+                'user.name',
+                'identity.id',
+            ];
+
+            if (key === `4`) {
+                selectArr = [
+                    'user.uuid',
+                    'user.id',
+                    'user.password',
+                    'identity.id',
+                ];
+            }
+
             // 根据 uuid 获取用户的 uuid, password, identity 字段, 需要联合 identity 表查询
             const repository = this.repository[key];
             const result = await repository
                 .createQueryBuilder('user')
                 .leftJoinAndSelect('user.identity', 'identity')
-                .select([
-                    'user.uuid',
-                    'user.password',
-                    'user.id',
-                    'user.name',
-                    'identity.id',
-                ])
+                .select(selectArr)
                 .where('user.uuid = :uuid', { uuid })
                 .getOne();
 

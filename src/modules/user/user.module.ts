@@ -6,11 +6,12 @@ import { Student } from '@/entities/Student';
 import { Teacher } from '@/entities/Teacher';
 import { Specialist } from '@/entities/Specialist';
 import { AuthModule } from '@/auth/auth.module';
+import { Root } from '@/entities/Root';
 
 @Module({
     imports: [
         forwardRef(() => AuthModule),
-        TypeOrmModule.forFeature([Student, Teacher, Specialist]),
+        TypeOrmModule.forFeature([Student, Teacher, Specialist, Root]),
     ],
     controllers: [UserController],
     providers: [UserService],
