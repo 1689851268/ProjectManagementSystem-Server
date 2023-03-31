@@ -21,7 +21,10 @@ export class ProjectAttachment {
     @Column('varchar', { length: 100 })
     storagePath: string;
 
+    @Column({ type: 'int', unsigned: true }) // 0-开题报告, 1-结题报告
+    type: number;
+
     @ManyToOne(() => Project, (project) => project.projectAttachments)
     @JoinColumn([{ name: 'projectId', referencedColumnName: 'id' }])
-    projectId: Project;
+    projectId: number;
 }

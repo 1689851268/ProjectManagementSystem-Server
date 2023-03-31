@@ -22,6 +22,7 @@ export class NotificationAttachmentController {
         private readonly notificationAttachmentService: NotificationAttachmentService,
     ) {}
 
+    // 创建附件, 更新 notification_attachments 表
     @Post()
     create(
         @Body()
