@@ -10,6 +10,7 @@ import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryT } from './utils/interface';
 import { formatProjectData, queryHandler } from './utils/serviceHandler';
+import { ProjectAttachment } from '@/entities/ProjectAttachment';
 
 @Injectable()
 export class ProjectService {
@@ -24,6 +25,8 @@ export class ProjectService {
         private readonly studentRepository: Repository<Student>,
         @InjectRepository(Specialist)
         private readonly specialistRepository: Repository<Specialist>,
+        @InjectRepository(ProjectAttachment)
+        private readonly projectAttachmentRepository: Repository<ProjectAttachment>,
     ) {}
 
     create(createProjectDto: CreateProjectDto) {
@@ -332,5 +335,59 @@ export class ProjectService {
             })
             .where('id = :id', { id: projectId })
             .execute();
+    }
+
+    // 根据 projectId 获取项目的详细信息, 包括项目的信息，项目成员的信息，项目附件的信息
+    async findDetail(id: number) {
+        const project = await this.projectRepository
+            .createQueryBuilder('project')
+            .select([
+                'project.id',
+                'project.name',
+                'project.description',
+                'project.openTime',
+                'project.finishTime',
+                'project.publishTime',
+                'project.applicationDate',
+                'project.failureTime',
+                'projectLeader.id',
+                'projectLeader.name',
+                'teacher.id',
+                'teacher.name',
+                'specialist.id',
+                'specialist.name',
+                'status.id',
+                'status.name',
+                'type.id',
+                'type.name',
+            ])
+            .leftJoinAndSelect('project.projectLeader', 'projectLeader')
+            .leftJoinAndSelect('project.teacher', 'teacher')
+            .leftJoinAndSelect('project.specialist', 'specialist')
+            .leftJoinAndSelect('project.status', 'status')
+            .leftJoinAndSelect('project.type', 'type')
+            .where('project.id = :id', { id })
+            .getOne();
+
+        // 根据 projectId 查询项目成员, 学生与项目的关系表是 project_and_student
+        const members = await this.projectRepository
+            .createQueryBuilder('project')
+            .leftJoinAndSelect('project.students', 'student')
+            // .select(['student.id', 'student.name'])
+            .where('project.id = :id', { id })
+            .getMany();
+
+        const attachment = await this.projectAttachmentRepository
+            .createQueryBuilder('projectAttachment')
+            .select([
+                'projectAttachment.id',
+                'projectAttachment.name',
+                'projectAttachment.storagePath',
+                'projectAttachment.type',
+            ])
+            .where('projectAttachment.projectId = :id', { id })
+            .getMany();
+
+        return { project, members, attachment };
     }
 }

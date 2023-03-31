@@ -110,6 +110,12 @@ export class ProjectController {
         return this.projectService.findOne(id);
     }
 
+    // 根据 projectId 查询项目的详细信息
+    @Get('detail/:id')
+    findDetail(@Param('id', ParseIntPipe) id: number) {
+        return this.projectService.findDetail(id);
+    }
+
     // 根据项目负责人 id 查询项目
     @Get(':userId/:identity')
     findByProjectLeader(

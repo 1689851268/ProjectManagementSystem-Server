@@ -7,6 +7,7 @@ import { Teacher } from 'src/entities/Teacher';
 import { College } from 'src/entities/College';
 import { Student } from '@/entities/Student';
 import { Specialist } from '@/entities/Specialist';
+import { ProjectAttachment } from '@/entities/ProjectAttachment';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { Specialist } from '@/entities/Specialist';
             College,
             Student,
             Specialist,
+            ProjectAttachment,
         ]),
     ],
     controllers: [ProjectController],
