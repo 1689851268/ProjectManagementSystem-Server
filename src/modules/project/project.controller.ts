@@ -33,6 +33,7 @@ export class ProjectController {
             projectLeader: null,
             type: createProjectDto.type,
             teacher: createProjectDto.teacher,
+            finishTime: '',
             specialist: null,
             status: 1,
             description: createProjectDto.description,

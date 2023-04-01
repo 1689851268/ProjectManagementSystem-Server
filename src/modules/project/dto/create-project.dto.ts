@@ -11,6 +11,7 @@ export class CreateProjectDto {
     description: string;
     failureTime?: string;
     openTime?: string;
+    finishTime?: string;
 }
 
 export class ApplyProjectDto {
