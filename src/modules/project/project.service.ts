@@ -47,51 +47,42 @@ export class ProjectService {
             .execute();
     }
 
-    // 申请项目
+    // 学生申请项目
     async apply(applyProjectDto: ApplyProjectDto) {
-        // 使用 QueryBuilder 更新数据
-        // 1. 根据 projectId 查询项目, 并将项目的 status 设置为 2, projectLeader 设置为 applyUserId, applicationDate 设置为当前时间
-        const project = await this.projectRepository
+        const { projectId, applyUserId, applicationDate, status, teammateId } =
+            applyProjectDto;
+
+        // 根据 projectId 更新项目的 status, projectLeader, applicationDate
+        const project = await this.projectRepository.update(
+            { id: projectId },
+            { status, projectLeader: applyUserId, applicationDate },
+        );
+
+        // 如果队友 id 为空, 则直接返回项目的更新信息
+        if (teammateId.length === 0) {
+            return {
+                projectAffected: project.affected,
+                teammateAffected: 0,
+            };
+        }
+
+        // 根据 teammateId 更新 project_and_student 表, 将项目 id 设置为 projectId, 学生 id 设置为 teammateId 里面的所有 id
+        const insertValues = teammateId.map((studentId) => ({
+            projectId,
+            studentId,
+        }));
+        const teammate = await this.projectRepository
             .createQueryBuilder()
-            .update(Project)
-            .set({
-                status: 2,
-                projectLeader: applyProjectDto.applyUserId,
-                applicationDate: applyProjectDto.applicationDate,
-            })
-            .where('id = :id', { id: applyProjectDto.projectId })
+            .insert()
+            .into('project_and_student')
+            .values(insertValues)
             .execute();
 
-        // 2. 为 project_and_student 表插入数据, 项目 id 为 projectId, 学生 id 为 teammateId 里面的所有 id
-        const { projectId, teammateId } = applyProjectDto;
-        const teammate = [];
-        teammateId.forEach(async (id) => {
-            // 先查看该学生是否已经申请了项目, 如果已经申请了项目, 则不允许再次申请
-            const againApply = await this.projectRepository
-                .createQueryBuilder('project')
-                .select('project.id')
-                .innerJoin(
-                    'project_and_student',
-                    'pas',
-                    'pas.projectId = project.id',
-                )
-                .where('pas.studentId = :id', { id })
-                .getOne();
-            if (againApply) {
-                return;
-            }
-
-            // 如果没有申请过项目, 则允许申请
-            const res = await this.projectRepository
-                .createQueryBuilder()
-                .insert()
-                .into('project_and_student')
-                .values({ projectId, studentId: id })
-                .execute();
-            teammate.push(res);
-        });
-
-        return { project, teammate };
+        // 返回项目和队友的更新信息
+        return {
+            projectAffected: project.affected,
+            teammateAffected: teammate.raw?.affectedRows,
+        };
     }
 
     // 教师拒绝申请
@@ -319,8 +310,8 @@ export class ProjectService {
     }
 
     // 根据 id 删除项目
-    async remove(id: number) {
-        const res = await this.projectRepository.delete(id);
+    async remove(projectId: number) {
+        const res = await this.projectRepository.delete(projectId);
         return res.affected; // 返回删除的条数
     }
 

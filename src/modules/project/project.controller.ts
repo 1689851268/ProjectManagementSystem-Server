@@ -15,9 +15,9 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { QueryT } from './utils/interface';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { UpdateProjectPipe } from './pipes/update-project.pipe';
 import { CreateProjectPipe } from './pipes/create-project.pipe';
 import { ApplyProjectDto } from './dto/apply-project.dto';
+import { ApplyProjectPipe } from './pipes/apply-project.pipe';
 
 @Controller('project')
 @UseGuards(AuthGuard('jwt')) // 使用 JWT 鉴权校验用户信息
@@ -34,18 +34,20 @@ export class ProjectController {
     @Patch(':projectId')
     update(
         @Param('projectId', ParseIntPipe) projectId: number,
-        @Body(UpdateProjectPipe) updateProjectDto: UpdateProjectDto,
+        @Body() updateProjectDto: UpdateProjectDto,
     ) {
         return this.projectService.update(projectId, updateProjectDto);
     }
 
+    // 教师根据 projectId 删除项目
+    @Delete(':projectId')
+    remove(@Param('projectId', ParseIntPipe) projectId: number) {
+        return this.projectService.remove(projectId);
+    }
+
     // 学生申请项目
     @Post('apply')
-    apply(@Body() applyProjectDto: ApplyProjectDto) {
-        applyProjectDto = {
-            ...applyProjectDto,
-            applicationDate: `${new Date().getTime()}`,
-        };
+    apply(@Body(ApplyProjectPipe) applyProjectDto: ApplyProjectDto) {
         return this.projectService.apply(applyProjectDto);
     }
 
@@ -132,11 +134,5 @@ export class ProjectController {
             college: query.college,
         };
         return this.projectService.findByProjectLeader(userId, identity, query);
-    }
-
-    // 删除项目
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.projectService.remove(+id);
     }
 }
