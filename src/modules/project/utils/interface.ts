@@ -1,9 +1,9 @@
 export interface QueryT {
     projectName: string;
-    projectType: number;
+    college: string;
     teacher: string;
+    projectType: number;
     projectStatus: number;
     curPage: number;
     pageSize: number;
-    college: string;
 }

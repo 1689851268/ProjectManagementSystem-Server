@@ -18,6 +18,8 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateProjectPipe } from './pipes/create-project.pipe';
 import { ApplyProjectDto } from './dto/apply-project.dto';
 import { ApplyProjectPipe } from './pipes/apply-project.pipe';
+import { QueryProjectDto, realQueryProjectDto } from './dto/query-project.dto';
+import { QueryProjectPipe } from './pipes/query-project.pipe';
 
 @Controller('project')
 @UseGuards(AuthGuard('jwt')) // 使用 JWT 鉴权校验用户信息
@@ -119,20 +121,15 @@ export class ProjectController {
 
     // 根据项目负责人 id 查询项目
     @Get(':userId/:identity')
-    findByProjectLeader(
+    findByUserIdAndIdentity(
         @Param('userId', ParseIntPipe) userId: number,
         @Param('identity', ParseIntPipe) identity: number,
-        @Query() query: QueryT,
+        @Query(QueryProjectPipe) queryProjectDto: QueryProjectDto,
     ) {
-        query = {
-            projectName: query.projectName,
-            projectType: +query.projectType,
-            teacher: query.teacher,
-            projectStatus: +query.projectStatus,
-            curPage: +query.curPage,
-            pageSize: +query.pageSize,
-            college: query.college,
-        };
-        return this.projectService.findByProjectLeader(userId, identity, query);
+        return this.projectService.findByUserIdAndIdentity(
+            userId,
+            identity,
+            queryProjectDto as unknown as realQueryProjectDto,
+        );
     }
 }

@@ -12,6 +12,7 @@ import { QueryT } from './utils/interface';
 import { formatProjectData, queryHandler } from './utils/serviceHandler';
 import { ProjectAttachment } from '@/entities/ProjectAttachment';
 import { ApplyProjectDto } from './dto/apply-project.dto';
+import { realQueryProjectDto } from './dto/query-project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -178,16 +179,20 @@ export class ProjectService {
     }
 
     // 根据 ProjectLeader 查询项目
-    async findByProjectLeader(userId: number, identity: number, query: QueryT) {
+    async findByUserIdAndIdentity(
+        userId: number,
+        identity: number,
+        queryProjectDto: realQueryProjectDto,
+    ) {
         const {
             projectName,
-            projectType,
+            college,
             teacher,
+            projectType,
             projectStatus,
             curPage,
             pageSize,
-            college,
-        } = query;
+        } = queryProjectDto;
 
         // 根据 identity 判断是学生, 老师, 还是专家
         // 如果是学生, 则 userId 为 projectLeader
