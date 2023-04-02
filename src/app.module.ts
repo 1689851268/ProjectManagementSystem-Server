@@ -29,7 +29,6 @@ import { MetaDataModule } from './modules/meta-data/meta-data.module';
 import { NotificationAttachmentModule } from './modules/notification-attachment/notification-attachment.module';
 import { UserModule } from './modules/user/user.module';
 import { MajorModule } from './modules/major/major.module';
-import { MenusModule } from './modules/menus/menus.module';
 
 @Module({
     imports: [
@@ -84,7 +83,6 @@ import { MenusModule } from './modules/menus/menus.module';
         NotificationAttachmentModule,
         UserModule,
         MajorModule,
-        MenusModule,
     ],
 })
 export class AppModule {}

@@ -6,11 +6,12 @@ import { College } from 'src/entities/College';
 import { Project } from 'src/entities/Project';
 import { Teacher } from 'src/entities/Teacher';
 import { Repository } from 'typeorm';
-import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
+import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryT } from './utils/interface';
 import { formatProjectData, queryHandler } from './utils/serviceHandler';
 import { ProjectAttachment } from '@/entities/ProjectAttachment';
+import { ApplyProjectDto } from './dto/apply-project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -29,19 +30,20 @@ export class ProjectService {
         private readonly projectAttachmentRepository: Repository<ProjectAttachment>,
     ) {}
 
+    // 教师创建项目
     create(createProjectDto: CreateProjectDto) {
         const newProject = this.projectRepository.create(createProjectDto);
         return this.projectRepository.save(newProject);
     }
 
-    // 根据 id 更新项目
-    update(id: number, updateProjectDto: UpdateProjectDto) {
+    // 根据 projectId 更新项目
+    update(projectId: number, updateProjectDto: UpdateProjectDto) {
         // 使用 QueryBuilder 更新数据
         return this.projectRepository
             .createQueryBuilder()
             .update(Project)
             .set(updateProjectDto)
-            .where('id = :id', { id })
+            .where('id = :id', { id: projectId })
             .execute();
     }
 

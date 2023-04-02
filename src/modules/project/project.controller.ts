@@ -11,34 +11,32 @@ import {
     Patch,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
-import { ApplyProjectDto, CreateProjectDto } from './dto/create-project.dto';
+import { CreateProjectDto } from './dto/create-project.dto';
 import { QueryT } from './utils/interface';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { UpdateProjectPipe } from './pipes/update-project.pipe';
+import { CreateProjectPipe } from './pipes/create-project.pipe';
+import { ApplyProjectDto } from './dto/apply-project.dto';
 
 @Controller('project')
 @UseGuards(AuthGuard('jwt')) // 使用 JWT 鉴权校验用户信息
 export class ProjectController {
     constructor(private readonly projectService: ProjectService) {}
 
+    // 教师创建项目
     @Post()
-    create(@Body() createProjectDto: CreateProjectDto) {
-        createProjectDto = {
-            name: createProjectDto.name,
-            publishTime: `${new Date().getTime()}`,
-            applicationDate: '',
-            failureTime: '',
-            openTime: '',
-            projectLeader: null,
-            type: createProjectDto.type,
-            teacher: createProjectDto.teacher,
-            finishTime: '',
-            specialist: null,
-            status: 1,
-            description: createProjectDto.description,
-        };
+    create(@Body(CreateProjectPipe) createProjectDto: CreateProjectDto) {
         return this.projectService.create(createProjectDto);
+    }
+
+    // 教师根据 projectId 更新项目
+    @Patch(':projectId')
+    update(
+        @Param('projectId', ParseIntPipe) projectId: number,
+        @Body(UpdateProjectPipe) updateProjectDto: UpdateProjectDto,
+    ) {
+        return this.projectService.update(projectId, updateProjectDto);
     }
 
     // 学生申请项目
@@ -140,14 +138,5 @@ export class ProjectController {
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.projectService.remove(+id);
-    }
-
-    // 更新项目信息
-    @Patch(':id')
-    update(
-        @Param('id', ParseIntPipe) id: number,
-        @Body(UpdateProjectPipe) updateProjectDto: UpdateProjectDto,
-    ) {
-        return this.projectService.update(id, updateProjectDto);
     }
 }
