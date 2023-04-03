@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { College } from 'src/entities/College';
 import { Project } from 'src/entities/Project';
 import { Teacher } from 'src/entities/Teacher';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryT } from './utils/interface';
@@ -388,4 +388,84 @@ export class ProjectService {
 
         return { project, members, attachment };
     }
+
+    // 根据 studentId 查询学生参与的项目
+    async findByStudentId(
+        studentId: number,
+        {
+            projectName,
+            college,
+            teacher,
+            projectType,
+            projectStatus,
+            curPage,
+            pageSize,
+        }: realQueryProjectDto,
+    ) {
+        const result = this.projectRepository.createQueryBuilder('project');
+
+        findByStudentIdLeftJoinAndSelect(result);
+
+        result.where('student.id = :studentId', { studentId });
+
+        // 需要模糊查询: projectName-项目名, college-学院名, teacher-老师名
+        if (projectName) {
+            result.andWhere('project.name like :projectName', {
+                projectName: `%${projectName}%`,
+            });
+        }
+        if (college) {
+            result.andWhere('college.name like :college', {
+                college: `%${college}%`,
+            });
+        }
+        if (teacher) {
+            result.andWhere('teacher.name like :teacher', {
+                teacher: `%${teacher}%`,
+            });
+        }
+
+        // 需要精确查询: projectType-项目类型, projectStatus-项目状态
+        if (projectType) {
+            result.andWhere('type.id = :projectType', { projectType });
+        }
+        if (projectStatus) {
+            result.andWhere('status.id = :projectStatus', { projectStatus });
+        }
+
+        // 需要倒序排列: 以 id 为准
+        // 需要分页查询: curPage-当前页, pageSize-每页条数
+        return result
+            .orderBy('project.id', 'DESC')
+            .offset((curPage - 1) * pageSize)
+            .limit(pageSize)
+            .getManyAndCount();
+    }
 }
+
+// 供 findByStudentId 方法使用
+const findByStudentIdLeftJoinAndSelect = async (
+    queryBuilder: SelectQueryBuilder<Project>,
+) => {
+    queryBuilder
+        .leftJoin('project.students', 'student')
+        .leftJoin('project.projectLeader', 'projectLeader')
+        .leftJoin('project.teacher', 'teacher')
+        .leftJoin('project.specialist', 'specialist')
+        .leftJoin('project.status', 'status')
+        .leftJoin('project.type', 'type')
+        .leftJoin('teacher.college', 'college') // 根据教师的 college 属性作为外键, 在 college 表中获取学院名
+        .select([
+            'project.id',
+            'project.name',
+            'project.type',
+            'project.publishTime',
+            'project.applicationDate',
+        ])
+        .addSelect(['teacher.id', 'teacher.name'])
+        .addSelect(['projectLeader.id', 'projectLeader.name'])
+        .addSelect(['specialist.id', 'specialist.name'])
+        .addSelect(['status.id', 'status.name'])
+        .addSelect(['type.id', 'type.name'])
+        .addSelect(['college.id', 'college.name']);
+};

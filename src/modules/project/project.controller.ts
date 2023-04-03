@@ -119,7 +119,19 @@ export class ProjectController {
         return this.projectService.findDetail(id);
     }
 
-    // 根据项目负责人 id 查询项目
+    // 根据 studentId 查询学生参与的项目
+    @Get('student/:studentId')
+    findByStudentId(
+        @Param('studentId', ParseIntPipe) studentId: number,
+        @Query(QueryProjectPipe) queryProjectDto: QueryProjectDto,
+    ) {
+        return this.projectService.findByStudentId(
+            studentId,
+            queryProjectDto as unknown as realQueryProjectDto,
+        );
+    }
+
+    // 根据 userId 和 identity 查询项目
     @Get(':userId/:identity')
     findByUserIdAndIdentity(
         @Param('userId', ParseIntPipe) userId: number,
