@@ -13,6 +13,7 @@ import { formatProjectData, queryHandler } from './utils/serviceHandler';
 import { ProjectAttachment } from '@/entities/ProjectAttachment';
 import { ApplyProjectDto } from './dto/apply-project.dto';
 import { realQueryProjectDto } from './dto/query-project.dto';
+import { AllowApplyDto } from './dto/allow-apply.dto';
 
 @Injectable()
 export class ProjectService {
@@ -136,15 +137,15 @@ export class ProjectService {
         return { project, projectAndStudent };
     }
 
-    // 专家拒绝开题 and 专家拒绝结题
-    rejectOpen(projectId: number) {
+    // 专家拒绝开题 and 专家拒绝结题 -→ 使项目失效
+    invalidate(projectId: number) {
         // 使用 QueryBuilder 更新数据, 将项目的 status 设置为 6, failureTime 设置为当前时间
         return this.projectRepository
             .createQueryBuilder()
             .update(Project)
             .set({
                 status: 6,
-                failureTime: `${new Date().getTime()}`,
+                failureTime: `${Date.now()}`,
             })
             .where('id = :id', { id: projectId })
             .execute();
@@ -158,7 +159,7 @@ export class ProjectService {
             .update(Project)
             .set({
                 status: 4,
-                openTime: `${new Date().getTime()}`,
+                openTime: `${Date.now()}`,
             })
             .where('id = :id', { id: projectId })
             .execute();
@@ -321,17 +322,16 @@ export class ProjectService {
     }
 
     // 根据 projectId 更新 project 表
-    allowApply(projectId: number, specialist: number) {
+    allowApply({ status, specialist, projectId: id }: AllowApplyDto) {
         // 使用 QueryBuilder 更新数据
-        // 更新 status 为 3, specialist 为 specialist
         return this.projectRepository
             .createQueryBuilder()
             .update(Project)
             .set({
-                status: 3,
+                status,
                 specialist,
             })
-            .where('id = :id', { id: projectId })
+            .where('id = :id', { id })
             .execute();
     }
 

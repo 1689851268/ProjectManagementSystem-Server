@@ -20,6 +20,8 @@ import { ApplyProjectDto } from './dto/apply-project.dto';
 import { ApplyProjectPipe } from './pipes/apply-project.pipe';
 import { QueryProjectDto, realQueryProjectDto } from './dto/query-project.dto';
 import { QueryProjectPipe } from './pipes/query-project.pipe';
+import { AllowApplyDto } from './dto/allow-apply.dto';
+import { AllowApplyPipe } from './pipes/allow-apply.pipe';
 
 @Controller('project')
 @UseGuards(AuthGuard('jwt')) // 使用 JWT 鉴权校验用户信息
@@ -30,6 +32,30 @@ export class ProjectController {
     @Post()
     create(@Body(CreateProjectPipe) createProjectDto: CreateProjectDto) {
         return this.projectService.create(createProjectDto);
+    }
+
+    // 教师同意申请
+    @Patch('allow')
+    allowApply(@Body(AllowApplyPipe) allowApplyDto: AllowApplyDto) {
+        return this.projectService.allowApply(allowApplyDto);
+    }
+
+    // 专家同意开题
+    @Patch('allowOpen')
+    allowOpen(@Body('projectId') projectId: number) {
+        return this.projectService.allowOpen(projectId);
+    }
+
+    // 专家同意结题
+    @Patch('allowClose')
+    allowClose(@Body('projectId') projectId: number) {
+        return this.projectService.allowClose(projectId);
+    }
+
+    // 专家拒绝开题 or 专家拒绝结题 -→ 使项目失效
+    @Patch('invalidate')
+    invalidate(@Body('projectId') projectId: number) {
+        return this.projectService.invalidate(projectId);
     }
 
     // 教师根据 projectId 更新项目
@@ -63,33 +89,6 @@ export class ProjectController {
     @Post('reject')
     rejectApply(@Body('projectId', ParseIntPipe) projectId: number) {
         return this.projectService.rejectApply(projectId);
-    }
-
-    // 教师同意申请
-    @Patch('allow')
-    allowApply(
-        @Body('projectId') projectId: number,
-        @Body('specialist') specialist: number,
-    ) {
-        return this.projectService.allowApply(projectId, specialist);
-    }
-
-    // 专家拒绝开题 or 专家拒绝结题
-    @Patch('rejectOpen')
-    rejectOpen(@Body('projectId') projectId: number) {
-        return this.projectService.rejectOpen(projectId);
-    }
-
-    // 专家同意开题
-    @Patch('allowOpen')
-    allowOpen(@Body('projectId') projectId: number) {
-        return this.projectService.allowOpen(projectId);
-    }
-
-    // 专家同意结题
-    @Patch('allowClose')
-    allowClose(@Body('projectId') projectId: number) {
-        return this.projectService.allowClose(projectId);
     }
 
     // 获取所有的项目
