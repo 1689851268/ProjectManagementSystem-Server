@@ -186,8 +186,26 @@ export class NotificationService {
         return { newNotification, attachmentArr, status: 201 };
     }
 
-    remove(id: number) {
-        return this.notificationRepository.delete(id);
+    // 教师根据 id 删除通知
+    async remove(id: number) {
+        // 先删除 notificationAttachment 表中 notificationId 为 id 的数据
+        await this.notificationAttachmentRepository
+            .createQueryBuilder()
+            .delete()
+            .from(NotificationAttachment)
+            .where('notificationId = :id', { id })
+            .execute();
+
+        // 再删除 notification 表中 id 为 id 的数据
+        const res = await this.notificationRepository
+            .createQueryBuilder()
+            .delete()
+            .from(Notification)
+            .where('id = :id', { id })
+            .execute();
+
+        // 返回删除的数据条数
+        return res.affected;
     }
 
     // 根据 id 获取通知详情, 包括 title, content, attachment

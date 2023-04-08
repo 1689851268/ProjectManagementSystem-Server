@@ -94,8 +94,9 @@ export class NotificationController {
         return this.notificationService.update(id, createNotificationDto);
     }
 
+    // 教师删除通知
     @Delete(':id')
-    delete(@Param('id') id: number) {
-        return this.notificationService.remove(+id);
+    delete(@Param('id', ParseIntPipe) id: number) {
+        return this.notificationService.remove(id);
     }
 }
