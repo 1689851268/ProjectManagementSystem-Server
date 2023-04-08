@@ -1,4 +1,3 @@
-import { AchievementType } from '@/entities/AchievementType';
 import { College } from '@/entities/College';
 import { Identity } from '@/entities/Identity';
 import { Major } from '@/entities/Major';
@@ -11,8 +10,6 @@ import { Not, Repository } from 'typeorm';
 @Injectable()
 export class MetaDataService {
     constructor(
-        @InjectRepository(AchievementType)
-        private readonly achievementTypeRepository: Repository<AchievementType>,
         @InjectRepository(College)
         private readonly collegeRepository: Repository<College>,
         @InjectRepository(Identity)
@@ -28,7 +25,6 @@ export class MetaDataService {
     // 获取所有的元数据
     async findAll() {
         return {
-            achievementTypes: await this.achievementTypeRepository.find(),
             colleges: await this.collegeRepository.find(),
             majors: await this.majorRepository.find(),
             projectStatuses: await this.projectStatusRepository.find(),

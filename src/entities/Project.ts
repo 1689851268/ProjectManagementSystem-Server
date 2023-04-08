@@ -15,7 +15,6 @@ import { ProjectAttachment } from './ProjectAttachment';
 import { Specialist } from './Specialist';
 import { Student } from './Student';
 import { Teacher } from './Teacher';
-import { ProjectAchievement } from './ProjectAchievement';
 
 @Index('ProjectForStatus', ['status'], {})
 @Index('ProjectForType', ['type'], {})
@@ -74,10 +73,4 @@ export class Project {
         (projectAttachment) => projectAttachment.projectId,
     )
     projectAttachments: ProjectAttachment[];
-
-    @OneToMany(
-        () => ProjectAchievement,
-        (projectAchievement) => projectAchievement.projectId,
-    )
-    projectAchievement: ProjectAchievement[];
 }

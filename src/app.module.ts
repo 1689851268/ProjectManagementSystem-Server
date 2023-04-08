@@ -19,9 +19,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { ProjectAttachmentModule } from './modules/project-attachment/project-attachment.module';
 import { ProjectModule } from './modules/project/project.module';
 import { RootModule } from './modules/root/root.module';
-import { AchievementType } from './entities/AchievementType';
 import { Major } from './entities/Major';
-import { ProjectAchievement } from './entities/ProjectAchievement';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { StudentModule } from './modules/student/student.module';
 import { SpecialistModule } from './modules/specialist/specialist.module';
@@ -52,14 +50,12 @@ import { MajorModule } from './modules/major/major.module';
                     retryAttempts: configService.get(DbConfig.RETRYATTEMPTS),
                     // synchronize: configService.get(DbConfig.SYNCHRONIZE), // 第一次启动项目后请将其注释掉
                     entities: [
-                        AchievementType,
                         College,
                         Identity,
                         Major,
                         Notification,
                         NotificationAttachment,
                         Project,
-                        ProjectAchievement,
                         ProjectAttachment,
                         ProjectStatus,
                         ProjectType,
