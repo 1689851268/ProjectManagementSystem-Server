@@ -12,6 +12,7 @@ import {
     Req,
     Inject,
     forwardRef,
+    UseFilters,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,6 +21,7 @@ import { RemoveBody, UserQuery } from './utils/interfaces';
 import { Request } from 'express';
 import { AuthService } from '@/auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { DeleteUserFilter } from '@/filters/delete-user/delete-user.filter';
 
 @Controller('user')
 export class UserController {
@@ -127,6 +129,7 @@ export class UserController {
 
     // 删除用户
     @Delete()
+    @UseFilters(DeleteUserFilter) // 使用自定义的异常过滤器, 处理删除用户时的异常
     remove(@Body() body: RemoveBody) {
         return this.userService.remove(body);
     }
