@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+
+import { DbConfig } from './enum/dbConfig.enum';
+
 import { College } from './entities/College';
 import { Identity } from './entities/Identity';
 import { Notification } from './entities/Notification';
@@ -13,13 +16,13 @@ import { ProjectStatus } from './entities/ProjectStatus';
 import { Student } from './entities/Student';
 import { Teacher } from './entities/Teacher';
 import { ProjectType } from './entities/ProjectType';
-import { DbConfig } from './enum/dbConfig.enum';
+import { Major } from './entities/Major';
+
 import { CollegeModule } from './modules/college/college.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ProjectAttachmentModule } from './modules/project-attachment/project-attachment.module';
 import { ProjectModule } from './modules/project/project.module';
 import { RootModule } from './modules/root/root.module';
-import { Major } from './entities/Major';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { StudentModule } from './modules/student/student.module';
 import { SpecialistModule } from './modules/specialist/specialist.module';
